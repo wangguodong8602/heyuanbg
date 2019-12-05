@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.background.dao.DeviceMapper" >
+  <resultMap id="BaseResultMap" type="com.background.pojo.Device" >
+    <constructor >
+      <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="user_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="agent_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="device_id" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="device_key" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="device_type" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="active_code" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="create_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+      <arg column="update_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, user_id, agent_id, device_id, device_key, device_type, active_code, create_time, 
+    update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from device
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from device
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.background.pojo.Device" >
+    insert into device (id, user_id, agent_id, 
+      device_id, device_key, device_type, 
+      active_code, create_time, update_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{agentId,jdbcType=INTEGER}, 
+      #{deviceId,jdbcType=VARCHAR}, #{deviceKey,jdbcType=VARCHAR}, #{deviceType,jdbcType=VARCHAR}, 
+      #{activeCode,jdbcType=VARCHAR}, now(), now()
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.background.pojo.Device" >
+    insert into device
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="agentId != null" >
+        agent_id,
+      </if>
+      <if test="deviceId != null" >
+        device_id,
+      </if>
+      <if test="deviceKey != null" >
+        device_key,
+      </if>
+      <if test="deviceType != null" >
+        device_type,
+      </if>
+      <if test="activeCode != null" >
+        active_code,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="agentId != null" >
+        #{agentId,jdbcType=INTEGER},
+      </if>
+      <if test="deviceId != null" >
+        #{deviceId,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceKey != null" >
+        #{deviceKey,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceType != null" >
+        #{deviceType,jdbcType=VARCHAR},
+      </if>
+      <if test="activeCode != null" >
+        #{activeCode,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        now(),
+      </if>
+      <if test="updateTime != null" >
+        now(),
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.background.pojo.Device" >
+    update device
+    <set >
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="agentId != null" >
+        agent_id = #{agentId,jdbcType=INTEGER},
+      </if>
+      <if test="deviceId != null" >
+        device_id = #{deviceId,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceKey != null" >
+        device_key = #{deviceKey,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceType != null" >
+        device_type = #{deviceType,jdbcType=VARCHAR},
+      </if>
+      <if test="activeCode != null" >
+        active_code = #{activeCode,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = now(),
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.background.pojo.Device" >
+    update device
+    set user_id = #{userId,jdbcType=INTEGER},
+      agent_id = #{agentId,jdbcType=INTEGER},
+      device_id = #{deviceId,jdbcType=VARCHAR},
+      device_key = #{deviceKey,jdbcType=VARCHAR},
+      device_type = #{deviceType,jdbcType=VARCHAR},
+      active_code = #{activeCode,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = now()
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectByUserId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from device
+    where user_id = #{id}
+  </select>
+
+</mapper>

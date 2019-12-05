@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.background.dao.ShopperMapper" >
+  <resultMap id="BaseResultMap" type="com.background.pojo.Shopper" >
+    <constructor >
+      <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="user_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="agent_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="shoppername" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="phone" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="zfb_id" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="wx_id" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="ysf_id" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="authcode" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="address" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="rate" jdbcType="REAL" javaType="java.lang.Float" />
+      <arg column="bussiness_license" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="create_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+      <arg column="update_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, user_id, agent_id, shoppername, phone, zfb_id, wx_id, ysf_id, authcode, address, 
+    rate, bussiness_license, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from shopper
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from shopper
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.background.pojo.Shopper" >
+    insert into shopper (id, user_id, agent_id, 
+      shoppername, phone, zfb_id, 
+      wx_id, ysf_id, authcode, 
+      address, rate, bussiness_license, 
+      create_time, update_time)
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{agentId,jdbcType=INTEGER}, 
+      #{shoppername,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{zfbId,jdbcType=VARCHAR}, 
+      #{wxId,jdbcType=VARCHAR}, #{ysfId,jdbcType=VARCHAR}, #{authcode,jdbcType=VARCHAR}, 
+      #{address,jdbcType=VARCHAR}, #{rate,jdbcType=REAL}, #{bussinessLicense,jdbcType=VARCHAR}, 
+      now(), now())
+  </insert>
+  <insert id="insertSelective" parameterType="com.background.pojo.Shopper" >
+    insert into shopper
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="agentId != null" >
+        agent_id,
+      </if>
+      <if test="shoppername != null" >
+        shoppername,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+      <if test="zfbId != null" >
+        zfb_id,
+      </if>
+      <if test="wxId != null" >
+        wx_id,
+      </if>
+      <if test="ysfId != null" >
+        ysf_id,
+      </if>
+      <if test="authcode != null" >
+        authcode,
+      </if>
+      <if test="address != null" >
+        address,
+      </if>
+      <if test="rate != null" >
+        rate,
+      </if>
+      <if test="bussinessLicense != null" >
+        bussiness_license,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="agentId != null" >
+        #{agentId,jdbcType=INTEGER},
+      </if>
+      <if test="shoppername != null" >
+        #{shoppername,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="zfbId != null" >
+        #{zfbId,jdbcType=VARCHAR},
+      </if>
+      <if test="wxId != null" >
+        #{wxId,jdbcType=VARCHAR},
+      </if>
+      <if test="ysfId != null" >
+        #{ysfId,jdbcType=VARCHAR},
+      </if>
+      <if test="authcode != null" >
+        #{authcode,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="rate != null" >
+        #{rate,jdbcType=REAL},
+      </if>
+      <if test="bussinessLicense != null" >
+        #{bussinessLicense,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        now(),
+      </if>
+      <if test="updateTime != null" >
+        now(),
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.background.pojo.Shopper" >
+    update shopper
+    <set >
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="agentId != null" >
+        agent_id = #{agentId,jdbcType=INTEGER},
+      </if>
+      <if test="shoppername != null" >
+        shoppername = #{shoppername,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="zfbId != null" >
+        zfb_id = #{zfbId,jdbcType=VARCHAR},
+      </if>
+      <if test="wxId != null" >
+        wx_id = #{wxId,jdbcType=VARCHAR},
+      </if>
+      <if test="ysfId != null" >
+        ysf_id = #{ysfId,jdbcType=VARCHAR},
+      </if>
+      <if test="authcode != null" >
+        authcode = #{authcode,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="rate != null" >
+        rate = #{rate,jdbcType=REAL},
+      </if>
+      <if test="bussinessLicense != null" >
+        bussiness_license = #{bussinessLicense,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = now(),
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.background.pojo.Shopper" >
+    update shopper
+    set user_id = #{userId,jdbcType=INTEGER},
+      agent_id = #{agentId,jdbcType=INTEGER},
+      shoppername = #{shoppername,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      zfb_id = #{zfbId,jdbcType=VARCHAR},
+      wx_id = #{wxId,jdbcType=VARCHAR},
+      ysf_id = #{ysfId,jdbcType=VARCHAR},
+      authcode = #{authcode,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      rate = #{rate,jdbcType=REAL},
+      bussiness_license = #{bussinessLicense,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = now()
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectShopperByCondition" resultMap="BaseResultMap" parameterType="map">
+    select <include refid="Base_Column_List"/>
+    from shopper
+    <where>
+      1=1
+      <if test="null != hostID and '' != hostID">
+        and user_id = #{hostID}
+      </if>
+      <if test="null != agentID and '' != agentID">
+        and agent_id = #{agentID}
+      </if>
+      <if test="null == hostID or '' == hostID">
+        and user_id = #{userID}
+      </if>
+    </where>
+  </select>
+
+  <select id="selectByUserId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from shopper
+    where user_id = #{userID}
+  </select>
+</mapper>
