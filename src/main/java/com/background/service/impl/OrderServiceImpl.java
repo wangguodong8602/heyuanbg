@@ -21,12 +21,14 @@ import org.apache.avro.LogicalTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Service("iOederService")
 public class OrderServiceImpl implements IOrderService {
 
     private static final Logger log = LoggerFactory.getLogger(OrderServiceImpl.class);

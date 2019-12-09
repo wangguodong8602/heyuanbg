@@ -27,8 +27,6 @@ public class UserController {
     @Autowired
     private IUserService iUserService;
     @Autowired
-    private IOrderService iOrderService;
-    @Autowired
     private UserMapper userMapper;
     @Autowired
     private ShopperMapper shopperMapper;

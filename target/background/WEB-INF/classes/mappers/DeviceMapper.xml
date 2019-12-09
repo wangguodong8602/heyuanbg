@@ -149,4 +149,10 @@
     where user_id = #{id}
   </select>
 
+  <select id="selectBySN" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from device
+    where device_id = #{deviceSN}
+  </select>
 </mapper>
