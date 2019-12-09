@@ -189,6 +189,11 @@ public class UserController {
         return "/jsp/editUser.jsp";
     }
 
+    @RequestMapping(value = "/index.do", method = RequestMethod.GET)
+    public String index(HttpSession session) {
+        return "/jsp/index.jsp";
+    }
+
     @RequestMapping(value = "/editShopper.do", method = RequestMethod.GET)
     public String editShopper(int id, HttpSession session) {
         Shopper shopper = shopperMapper.selectByPrimaryKey(id);

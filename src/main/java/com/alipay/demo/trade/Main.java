@@ -252,6 +252,8 @@ public class Main {
 
         String appAuthToken = "应用授权令牌";//根据真实值填写
 
+
+
         // 创建条码支付请求builder，设置请求参数
         AlipayTradePayRequestBuilder builder = new AlipayTradePayRequestBuilder()
             //            .setAppAuthToken(appAuthToken)

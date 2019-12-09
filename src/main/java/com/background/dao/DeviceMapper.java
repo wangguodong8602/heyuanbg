@@ -16,4 +16,6 @@ public interface DeviceMapper {
     int updateByPrimaryKey(Device record);
 
     Device selectByUserId(int id);
+
+    Device selectBySN(String deviceSN);
 }
