@@ -43,9 +43,10 @@ public class OrderController {
         return null;
     }
 
-    @RequestMapping(value = "mini_pay.do",method = RequestMethod.POST)
+    @RequestMapping(value = "/mini_pay.do",method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse miniPay(String bizNo,String barCode, String codeType, String deviceSn, String totalAmount){
+        System.out.println("剑来！");
         return iOrderService.pay(bizNo,barCode,codeType,deviceSn,totalAmount);
     }
 
