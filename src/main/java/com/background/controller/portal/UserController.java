@@ -7,6 +7,7 @@ import com.background.dao.ShopperMapper;
 import com.background.dao.UserMapper;
 import com.background.pojo.Shopper;
 import com.background.pojo.User;
+import com.background.service.IOrderService;
 import com.background.service.IUserService;
 import com.background.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,8 @@ public class UserController {
 
     @Autowired
     private IUserService iUserService;
+    @Autowired
+    private IOrderService iOrderService;
     @Autowired
     private UserMapper userMapper;
     @Autowired

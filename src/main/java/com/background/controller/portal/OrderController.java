@@ -7,9 +7,11 @@ import com.background.common.Const;
 import com.background.common.ResponseCode;
 import com.background.common.ServerResponse;
 import com.background.pojo.User;
+import com.background.service.IOrderService;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -25,6 +27,9 @@ public class OrderController {
 
     private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
 
+    @Autowired
+    private IOrderService iOrderService;
+
 
     @RequestMapping("pay.do")
     @ResponseBody
@@ -35,6 +40,12 @@ public class OrderController {
         }
         String path = request.getSession().getServletContext().getRealPath("upload");
         return null;
+    }
+
+    @RequestMapping("mini_pay.do")
+    @ResponseBody
+    public ServerResponse miniPay(String bizNo,String barCode, String codeType, String deviceSn, String totalAmount){
+        return iOrderService.pay(bizNo,barCode,codeType,deviceSn,totalAmount);
     }
 
     @RequestMapping("alipay_callback.do")
