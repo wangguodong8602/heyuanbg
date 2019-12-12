@@ -249,13 +249,16 @@ public class OrderServiceImpl implements IOrderService {
 
         // 调用tradePay方法获取当面付应答
         AlipayF2FPayResult result = tradeService.tradePay(builder);
+        log.info(result.toString());
+        System.out.println(result);
+        System.out.println(result.toString());
         switch (result.getTradeStatus()) {
             case SUCCESS:
                 log.info("支付宝支付成功: )");
                 break;
 
             case FAILED:
-                log.info(result.getResponse().getMsg());
+                log.info(result.getResponse().getMsg().toString());
                 log.error("支付宝支付失败!!!");
                 break;
 
