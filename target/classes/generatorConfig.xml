@@ -19,7 +19,7 @@
         </commentGenerator>
 
         <!--jdbc的数据库连接 -->
-        <jdbcConnection
+        <jdbcConnection>
                 driverClass="${db.driverClassName}"
                 connectionURL="${db.url}"
                 userId="${db.username}"

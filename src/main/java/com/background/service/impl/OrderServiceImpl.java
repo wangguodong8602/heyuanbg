@@ -1,8 +1,16 @@
 package com.background.service.impl;
 
+import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 //import com.alipay.api.domain.ExtendParams;
 
+import com.alipay.api.CertAlipayRequest;
+import com.alipay.api.DefaultAlipayClient;
+import com.alipay.api.request.AlipayOpenAuthTokenAppRequest;
+import com.alipay.api.request.AlipayTradeAppPayRequest;
+import com.alipay.api.request.AlipayTradePayRequest;
+import com.alipay.api.response.AlipayOpenAuthTokenAppResponse;
+import com.alipay.api.response.AlipayTradePayResponse;
 import com.alipay.demo.trade.config.Configs;
 import com.alipay.demo.trade.model.GoodsDetail;
 
@@ -13,20 +21,26 @@ import com.alipay.demo.trade.service.AlipayTradeService;
 import com.alipay.demo.trade.service.impl.AlipayMonitorServiceImpl;
 import com.alipay.demo.trade.service.impl.AlipayTradeServiceImpl;
 import com.alipay.demo.trade.service.impl.AlipayTradeWithHBServiceImpl;
+import com.background.common.Const;
 import com.background.common.ServerResponse;
 import com.background.dao.*;
 import com.background.pojo.*;
 import com.background.service.IOrderService;
+import com.background.util.DateUtil;
+import com.github.wxpay.sdk.WXPay;
+import com.github.wxpay.sdk.WXPayUtil;
+import net.sf.jsqlparser.schema.Server;
 import org.apache.avro.LogicalTypes;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service("iOederService")
 public class OrderServiceImpl implements IOrderService {
@@ -34,6 +48,10 @@ public class OrderServiceImpl implements IOrderService {
     private static final Logger log = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     private static AlipayTradeService tradeService;
+    private static AlipayClient alipayClient;
+
+    private static final String PAY_SUCCESS = "SUCCESS";
+    private static final String PAY_USERPAYING = "USERPAYING";
 
     @Autowired
     private DeviceMapper deviceMapper;
@@ -56,8 +74,68 @@ public class OrderServiceImpl implements IOrderService {
          *  AlipayTradeService可以使用单例或者为静态成员对象，不需要反复new
          */
         tradeService = new AlipayTradeServiceImpl.ClientBuilder().build();
-    }
+        alipayClient = new DefaultAlipayClient("https://openapi.alipay.com/gateway.do", Const.APPID,Const.APP_PRIVATE_KEY,
+                "json", "utf8", Const.ALIPAY_PUBLIC_KEY,"RSA2");
+        /**
+        AlipayConfigz.init("zfbinfo.properties");
 
+        CertAlipayRequest certAlipayRequest = new CertAlipayRequest();
+        certAlipayRequest.setServerUrl("https://openapi.alipay.com/gateway.do");
+        certAlipayRequest.setAppId(AlipayConfigz.getAppid());
+        certAlipayRequest.setPrivateKey(AlipayConfigz.getPrivateKey());
+        certAlipayRequest.setFormat("json");
+        certAlipayRequest.setCharset(AlipayConfigz.getCharset());
+        certAlipayRequest.setSignType(AlipayConfigz.getSignType());
+        certAlipayRequest.setCertPath(AlipayConfigz.getApp_cert_path());
+        certAlipayRequest.setAlipayPublicCertPath(AlipayConfigz.getAlipay_cert_path());
+        certAlipayRequest.setRootCertPath(AlipayConfigz.getAlipay_root_cert_path());
+        try {
+            alipayClient = new DefaultAlipayClient(certAlipayRequest);
+        } catch (AlipayApiException e) {
+            e.printStackTrace();
+        }
+         **/
+    }
+    /**
+     * 证书模式的支付请求
+    public ServerResponse aliPay() throws AlipayApiException {
+
+        AlipayTradePayRequest request = new AlipayTradePayRequest();
+        request.setBizContent("{" +
+                "    \"out_trade_no\":\"20150320010101001\"," +
+                "    \"scene\":\"bar_code\"," +
+                "    \"auth_code\":\"285680975322612605\"," +//即用户在支付宝客户端内出示的付款码，使用一次即失效，需要刷新后再去付款
+                "    \"subject\":\"Iphone6 16G\"," +
+                "    \"store_id\":\"NJ_001\"," +
+                "    \"timeout_express\":\"2m\"," +
+                "    \"total_amount\":\"0.01\"" +
+                "  }"); //设置业务参数
+        System.out.println(alipayClient);
+        AlipayTradePayResponse response = alipayClient.certificateExecute(request,"201912BB86639a8792a442f3a55ea3149cfdcX65"); //通过alipayClient调用API，获得对应的response类
+        System.out.print(response.getBody());
+        if(response.isSuccess()){
+            System.out.println("调用成功！");
+        }else{
+            System.out.println("调用失败！");
+        }
+
+        return ServerResponse.createBySuccess(response.getBody());
+    }
+     **/
+
+    public ServerResponse authCallback(String app_id,String app_auth_code)throws AlipayApiException{
+        AlipayOpenAuthTokenAppRequest request = new AlipayOpenAuthTokenAppRequest();
+        request.setBizContent(
+            "{" + "\"grant_type\":\"authorization_code\"," +
+                "\"code\":" + app_auth_code +
+                "}"
+        );
+        AlipayOpenAuthTokenAppResponse response =alipayClient.execute(request);
+        if(response.isSuccess()){
+            return ServerResponse.createBySuccess(response);
+        }
+        return ServerResponse.createByErrorMessage("授权失败");
+    }
 
     /**
      *
@@ -114,7 +192,7 @@ public class OrderServiceImpl implements IOrderService {
         String storeId = shopper.getId().toString()+"-"+shopper.getUserId().toString()+"-"+shopper.getAgentId().toString();
 
         // 业务扩展参数，目前可添加由支付宝分配的系统商编号(通过setSysServiceProviderId方法)，详情请咨询支付宝技术支持
-        String providerId = "2088100200300400500";
+        String providerId = "2088631598114491";
         ExtendParams extendParams = new ExtendParams();
         extendParams.setSysServiceProviderId(providerId);
 
@@ -124,7 +202,7 @@ public class OrderServiceImpl implements IOrderService {
         // 商品明细列表，需填写购买商品详细信息，
         //List<GoodsDetail> goodsDetailList = new ArrayList<GoodsDetail>();
         // 创建一个商品信息，参数含义分别为商品id（使用国标）、名称、单价（单位为分）、数量，如果需要添加商品类别，详见GoodsDetail
-        GoodsDetail goods1 = GoodsDetail.newInstance("goods_id001", "xxx面包", 1000, 1);
+        //GoodsDetail goods1 = GoodsDetail.newInstance("goods_id001", "xxx面包", 1000, 1);
         // 创建好一个商品后添加至商品明细列表
         //goodsDetailList.add(goods1);
 
@@ -177,6 +255,7 @@ public class OrderServiceImpl implements IOrderService {
                 break;
 
             case FAILED:
+                log.info(result.getResponse().getMsg());
                 log.error("支付宝支付失败!!!");
                 break;
 
@@ -189,5 +268,86 @@ public class OrderServiceImpl implements IOrderService {
                 break;
         }
         return null;
+    }
+
+    public static ServerResponse scanCodeToPay(String auth_code) throws Exception {
+        MyConfig config = new MyConfig();
+        WXPay wxpay = new WXPay(config);
+        String out_trade_no = DateUtil.getCurrentTime();
+        Map<String, String> map = new HashMap<>(16);
+        map.put("attach", "订单额外描述");
+        map.put("auth_code", auth_code);
+        map.put("body", "付款码支付测试");
+        map.put("device_info", "1000");
+        map.put("nonce_str", WXPayUtil.generateNonceStr());
+        map.put("out_trade_no", out_trade_no);
+        map.put("spbill_create_ip", "14.17.22.52");
+        map.put("total_fee", "2");
+        //生成签名
+        String sign = WXPayUtil.generateSignature(map, config.getKey());
+        map.put("sign", sign);
+        String mapToXml = null;
+        try {
+            //调用微信的扫码支付接口
+            Map<String, String> resp = wxpay.microPay(map);
+            mapToXml = WXPayUtil.mapToXml(resp);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("微信支付失败"+ e);
+        }
+        //判断支付是否成功
+        String return_code = null;
+        String result_code = null;
+        String err_code_des = null;
+        String err_code = null;
+        //获取Document对象（主要是获取支付接口的返回信息）
+        Document doc = DocumentHelper.parseText(mapToXml);
+        //获取对象的根节点<xml>
+        Element rootElement = doc.getRootElement();
+        //获取对象的子节点
+        List<Element> elements = rootElement.elements();
+        for (Element element : elements) {
+            if(element.getName().equals("return_code")){
+                return_code = element.getTextTrim();
+            } else if(element.getName().equals("result_code")){
+                result_code = element.getTextTrim();
+            } else if(element.getName().equals("err_code_des")){
+                err_code_des = element.getTextTrim();
+            } else if(element.getName().equals("err_code")){
+                err_code = element.getTextTrim();
+            }
+        }
+        if(PAY_SUCCESS.equals(return_code) && PAY_SUCCESS.equals(result_code)){
+            log.info("微信免密支付成功！");
+            return ServerResponse.createBySuccessMessage(PAY_SUCCESS);
+        } else if (PAY_USERPAYING.equals(err_code)){
+            for(int i = 0; i < 4; i++){
+                Thread.sleep(3000);
+                Map<String, String> data = new HashMap<>(16);
+                data.put("out_trade_no", out_trade_no);
+                //调用微信的查询接口
+                Map<String, String> orderQuery = wxpay.orderQuery(data);
+                String orderResp = WXPayUtil.mapToXml(orderQuery);
+                String trade_state = null;
+                //获取Document对象
+                Document orderDoc = DocumentHelper.parseText(orderResp);
+                //获取对象的根节点<xml>
+                Element rootElement1 = orderDoc.getRootElement();
+                //获取对象的子节点
+                List<Element> elements1 = rootElement1.elements();
+                for (Element element : elements1) {
+                    if(element.getName().equals("trade_state")){
+                        trade_state = element.getTextTrim();
+                    }
+                }
+                if(PAY_SUCCESS.equals(trade_state)){
+                    log.info("微信加密支付成功！");
+                    return ServerResponse.createBySuccessMessage(PAY_SUCCESS);
+                }
+                log.info("正在支付" + orderResp);
+            }
+        }
+        log.error("微信支付失败！");
+        return ServerResponse.createBySuccess(err_code_des);
     }
 }

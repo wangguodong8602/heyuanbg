@@ -9,6 +9,7 @@ import com.background.common.ServerResponse;
 import com.background.pojo.User;
 import com.background.service.IOrderService;
 import com.google.common.collect.Maps;
+import net.sf.jsqlparser.schema.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,21 +33,9 @@ public class OrderController {
     private IOrderService iOrderService;
 
 
-    @RequestMapping("pay.do")
-    @ResponseBody
-    public ServerResponse pay(HttpSession session, Long orderNo, HttpServletRequest request){
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if(user == null){
-            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
-        }
-        String path = request.getSession().getServletContext().getRealPath("upload");
-        return null;
-    }
-
     @RequestMapping(value = "/mini_pay.do",method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse miniPay(String bizNo,String barCode, String codeType, String deviceSn, String totalAmount){
-        System.out.println("剑来！");
         return iOrderService.pay(bizNo,barCode,codeType,deviceSn,totalAmount);
     }
 
@@ -88,5 +77,11 @@ public class OrderController {
 
          */
         return null;
+    }
+
+    @RequestMapping(value = "auth_callback.do",method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse authCallback(String app_id,String app_auth_code)throws AlipayApiException{
+        return iOrderService.authCallback(app_id,app_auth_code);
     }
 }
