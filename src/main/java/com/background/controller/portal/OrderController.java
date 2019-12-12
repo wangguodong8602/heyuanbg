@@ -81,7 +81,7 @@ public class OrderController {
 
     @RequestMapping(value = "auth_callback.do",method = RequestMethod.GET)
     @ResponseBody
-    public ServerResponse authCallback(String app_id,String app_auth_code)throws AlipayApiException{
+    public ServerResponse authCallback(String app_id,String app_auth_code,String application_type,String source)throws AlipayApiException{
         return iOrderService.authCallback(app_id,app_auth_code);
     }
 }
