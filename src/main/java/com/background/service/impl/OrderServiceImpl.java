@@ -154,12 +154,13 @@ public class OrderServiceImpl implements IOrderService {
         //        + (long) (Math.random() * 10000000L);
         String outTradeNo = bizNo;
 
-        Device device = deviceMapper.selectBySN(deviceSn);
-        Shopper shopper = shopperMapper.selectByUserId(device.getUserId());
+        //Device device = deviceMapper.selectBySN(deviceSn);
+        //Shopper shopper = shopperMapper.selectByUserId(device.getUserId());
 
 
         // (必填) 订单标题，粗略描述用户的支付目的。如“xxx品牌xxx门店消费”
-        String subject = shopper.getShoppername()+"当面付消费";
+        //String subject = shopper.getShoppername()+"当面付消费";
+        String subject = "当面付消费";
 
         // (必填) 订单总金额，单位为元，不能超过1亿元
         // 如果同时传入了【打折金额】,【不可打折金额】,【订单总金额】三者,则必须满足如下条件:【订单总金额】=【打折金额】+【不可打折金额】
@@ -179,7 +180,7 @@ public class OrderServiceImpl implements IOrderService {
         // 卖家支付宝账号ID，用于支持一个签约账号下支持打款到不同的收款账号，(打款到sellerId对应的支付宝账号)
         // 如果该字段为空，则默认为与支付宝签约的商户的PID，也就是appid对应的PID
         //String sellerId = "";
-        String sellerId = shopper.getZfbId();
+        String sellerId = "2088912095293655";
 
         // 订单描述，可以对交易或商品进行一个详细地描述，比如填写"购买商品3件共20.00元"
         String body = "购买商品共"+totalAmount+"元";
@@ -188,8 +189,8 @@ public class OrderServiceImpl implements IOrderService {
         //String operatorId = "test_operator_id";
 
         // (必填) 商户门店编号，通过门店号和商家后台可以配置精准到门店的折扣信息，详询支付宝技术支持
-        //String storeId = "test_store_id";
-        String storeId = shopper.getId().toString()+"-"+shopper.getUserId().toString()+"-"+shopper.getAgentId().toString();
+        String storeId = "201999998887777";
+        //String storeId = shopper.getId().toString()+"-"+shopper.getUserId().toString()+"-"+shopper.getAgentId().toString();
 
         // 业务扩展参数，目前可添加由支付宝分配的系统商编号(通过setSysServiceProviderId方法)，详情请咨询支付宝技术支持
         String providerId = "2088631598114491";
@@ -211,7 +212,7 @@ public class OrderServiceImpl implements IOrderService {
         //goodsDetailList.add(goods2);
 
         //String appAuthToken = "应用授权令牌";//根据真实值填写
-        String appAuthToken = shopper.getAuthcode();
+        String appAuthToken = "201912BBbe1c26617d784bdd963923710f77fD65";
 
         // 创建条码支付请求builder，设置请求参数
         AlipayTradePayRequestBuilder builder = new AlipayTradePayRequestBuilder()
@@ -226,7 +227,7 @@ public class OrderServiceImpl implements IOrderService {
                 .setSellerId(sellerId)
                 //.setGoodsDetailList(goodsDetailList)
                 .setTimeoutExpress(timeoutExpress);
-
+        /**
         PayOrder payOrder = new PayOrder();
         payOrder.setOrderNo(Long.parseLong(bizNo));
         payOrder.setUserId(shopper.getUserId());
@@ -246,10 +247,11 @@ public class OrderServiceImpl implements IOrderService {
 
         payOrderMapper.insert(payOrder);
         payInfoMapper.insert(payInfo);
-
+        **/
         // 调用tradePay方法获取当面付应答
         AlipayF2FPayResult result = tradeService.tradePay(builder);
         log.info(result.toString());
+        log.info(result.getResponse().getBody());
         System.out.println(result);
         System.out.println(result.toString());
         switch (result.getTradeStatus()) {
