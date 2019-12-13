@@ -131,10 +131,12 @@ public class OrderServiceImpl implements IOrderService {
                 "}"
         );
         AlipayOpenAuthTokenAppResponse response =alipayClient.execute(request);
+        log.info(response.getBody());
         if(response.isSuccess()){
             return ServerResponse.createBySuccess(response);
+        }else{
+            return ServerResponse.createByErrorMessage("授权失败");
         }
-        return ServerResponse.createByErrorMessage("授权失败");
     }
 
     /**
