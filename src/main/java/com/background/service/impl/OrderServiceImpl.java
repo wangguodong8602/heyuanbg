@@ -154,13 +154,13 @@ public class OrderServiceImpl implements IOrderService {
         //        + (long) (Math.random() * 10000000L);
         String outTradeNo = bizNo;
 
-        //Device device = deviceMapper.selectBySN(deviceSn);
-        //Shopper shopper = shopperMapper.selectByUserId(device.getUserId());
+        Device device = deviceMapper.selectBySN(deviceSn);
+        Shopper shopper = shopperMapper.selectByUserId(device.getUserId());
 
 
         // (必填) 订单标题，粗略描述用户的支付目的。如“xxx品牌xxx门店消费”
-        //String subject = shopper.getShoppername()+"当面付消费";
-        String subject = "当面付消费";
+        String subject = shopper.getShoppername()+"当面付消费";
+        //String subject = "当面付消费";
 
         // (必填) 订单总金额，单位为元，不能超过1亿元
         // 如果同时传入了【打折金额】,【不可打折金额】,【订单总金额】三者,则必须满足如下条件:【订单总金额】=【打折金额】+【不可打折金额】
@@ -218,8 +218,10 @@ public class OrderServiceImpl implements IOrderService {
         AlipayTradePayRequestBuilder builder = new AlipayTradePayRequestBuilder()
                 .setAppAuthToken(appAuthToken)
                 .setOutTradeNo(outTradeNo)
-                .setSubject(subject).setAuthCode(authCode)
-                .setTotalAmount(totalAmount).setStoreId(storeId)
+                .setSubject(subject)
+                .setAuthCode(authCode)
+                .setTotalAmount(totalAmount)
+                .setStoreId(storeId)
                 .setUndiscountableAmount(undiscountableAmount)
                 .setBody(body)
                 //.setOperatorId(operatorId)
@@ -227,7 +229,7 @@ public class OrderServiceImpl implements IOrderService {
                 .setSellerId(sellerId)
                 //.setGoodsDetailList(goodsDetailList)
                 .setTimeoutExpress(timeoutExpress);
-        /**
+
         PayOrder payOrder = new PayOrder();
         payOrder.setOrderNo(Long.parseLong(bizNo));
         payOrder.setUserId(shopper.getUserId());
@@ -247,7 +249,7 @@ public class OrderServiceImpl implements IOrderService {
 
         payOrderMapper.insert(payOrder);
         payInfoMapper.insert(payInfo);
-        **/
+
         // 调用tradePay方法获取当面付应答
         AlipayF2FPayResult result = tradeService.tradePay(builder);
         log.info(result.toString());
@@ -260,7 +262,6 @@ public class OrderServiceImpl implements IOrderService {
                 break;
 
             case FAILED:
-                log.info(result.getResponse().getMsg().toString());
                 log.error("支付宝支付失败!!!");
                 break;
 
