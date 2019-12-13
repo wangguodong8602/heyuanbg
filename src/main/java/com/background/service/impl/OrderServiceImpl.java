@@ -127,7 +127,7 @@ public class OrderServiceImpl implements IOrderService {
         AlipayOpenAuthTokenAppRequest request = new AlipayOpenAuthTokenAppRequest();
         request.setBizContent(
             "{" + "\"grant_type\":\"authorization_code\"," +
-                "\"code\":" + app_auth_code +
+                "\"code\":"+ "\"" + app_auth_code + "\"" +
                 "}"
         );
         AlipayOpenAuthTokenAppResponse response =alipayClient.execute(request);
