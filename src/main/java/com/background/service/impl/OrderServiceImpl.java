@@ -309,6 +309,7 @@ public class OrderServiceImpl implements IOrderService {
         }
         //判断支付是否成功
         String return_code = null;
+        String return_msg = null;
         String result_code = null;
         String err_code_des = null;
         String err_code = null;
@@ -332,6 +333,9 @@ public class OrderServiceImpl implements IOrderService {
             } else if(element.getName().equals("err_code")){
                 err_code = element.getTextTrim();
                 log.info("err_code"+err_code);
+            } else if(element.getName().equals("return_msg")){
+                return_msg = element.getTextTrim();
+                log.info("return_msg "+return_msg);
             }
         }
         if(PAY_SUCCESS.equals(return_code) && PAY_SUCCESS.equals(result_code)){
