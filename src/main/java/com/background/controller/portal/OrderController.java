@@ -39,6 +39,12 @@ public class OrderController {
         return iOrderService.pay(bizNo,barCode,codeType,deviceSn,totalAmount);
     }
 
+    @RequestMapping(value = "/pay.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse pay(String barCode)throws Exception{
+        return iOrderService.scanCodeToPay(barCode);
+    }
+
     @RequestMapping("alipay_callback.do")
     @ResponseBody
     public Object alipayCallback(HttpServletRequest request){

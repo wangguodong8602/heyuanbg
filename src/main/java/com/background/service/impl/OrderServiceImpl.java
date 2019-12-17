@@ -130,10 +130,13 @@ public class OrderServiceImpl implements IOrderService {
                 "\"code\":"+ "\"" + app_auth_code + "\"" +
                 "}"
         );
+        HashMap<String,String> map = new HashMap<>();
         AlipayOpenAuthTokenAppResponse response =alipayClient.execute(request);
         log.info(response.getBody());
         if(response.isSuccess()){
-            return ServerResponse.createBySuccess(response);
+            map.put("账户ID",response.getUserId());
+            map.put("授权码",response.getAppAuthToken());
+            return ServerResponse.createBySuccess("授权成功",map);
         }else{
             return ServerResponse.createByErrorMessage("授权失败");
         }
@@ -278,19 +281,20 @@ public class OrderServiceImpl implements IOrderService {
         return null;
     }
 
-    public static ServerResponse scanCodeToPay(String auth_code) throws Exception {
+    public ServerResponse scanCodeToPay(String barCode) throws Exception {
         MyConfig config = new MyConfig();
         WXPay wxpay = new WXPay(config);
         String out_trade_no = DateUtil.getCurrentTime();
         Map<String, String> map = new HashMap<>(16);
+        map.put("sub_mch_id","1569327041");
         map.put("attach", "订单额外描述");
-        map.put("auth_code", auth_code);
+        map.put("auth_code", barCode);
         map.put("body", "付款码支付测试");
         map.put("device_info", "1000");
         map.put("nonce_str", WXPayUtil.generateNonceStr());
         map.put("out_trade_no", out_trade_no);
-        map.put("spbill_create_ip", "14.17.22.52");
-        map.put("total_fee", "2");
+        map.put("spbill_create_ip", "113.201.51.199");
+        map.put("total_fee", "0.01");
         //生成签名
         String sign = WXPayUtil.generateSignature(map, config.getKey());
         map.put("sign", sign);
@@ -310,6 +314,7 @@ public class OrderServiceImpl implements IOrderService {
         String err_code = null;
         //获取Document对象（主要是获取支付接口的返回信息）
         Document doc = DocumentHelper.parseText(mapToXml);
+
         //获取对象的根节点<xml>
         Element rootElement = doc.getRootElement();
         //获取对象的子节点
@@ -317,12 +322,16 @@ public class OrderServiceImpl implements IOrderService {
         for (Element element : elements) {
             if(element.getName().equals("return_code")){
                 return_code = element.getTextTrim();
+                log.info("return_code"+return_code);
             } else if(element.getName().equals("result_code")){
                 result_code = element.getTextTrim();
+                log.info("result_code"+result_code);
             } else if(element.getName().equals("err_code_des")){
                 err_code_des = element.getTextTrim();
+                log.info("err_code_des"+err_code_des);
             } else if(element.getName().equals("err_code")){
                 err_code = element.getTextTrim();
+                log.info("err_code"+err_code);
             }
         }
         if(PAY_SUCCESS.equals(return_code) && PAY_SUCCESS.equals(result_code)){
@@ -356,6 +365,6 @@ public class OrderServiceImpl implements IOrderService {
             }
         }
         log.error("微信支付失败！");
-        return ServerResponse.createBySuccess(err_code_des);
+        return ServerResponse.createByErrorMessage(err_code_des);
     }
 }

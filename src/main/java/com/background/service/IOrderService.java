@@ -9,4 +9,6 @@ public interface IOrderService {
     ///ServerResponse aliPay() throws AlipayApiException;
 
     ServerResponse authCallback(String app_id,String app_auth_code)throws AlipayApiException;
+
+    ServerResponse scanCodeToPay(String auth_code) throws Exception;
 }

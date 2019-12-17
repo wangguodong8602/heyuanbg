@@ -1,5 +1,6 @@
 package com.background.service.impl;
 
+import com.background.common.Const;
 import com.github.wxpay.sdk.WXPayConfig;
 
 import java.io.ByteArrayInputStream;
@@ -26,17 +27,17 @@ public class MyConfig implements WXPayConfig {
      */
     @Override
     public String getAppID() {
-        return "自己的appId";
+        return Const.WX_APPID;
     }
 
     @Override
     public String getMchID() {
-        return "自己的商户号";
+        return Const.MCH_ID;
     }
 
     @Override
     public String getKey() {
-        return "自己的密钥";
+        return Const.WX_KEY;
     }
 
     @Override

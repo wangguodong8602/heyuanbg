@@ -394,9 +394,10 @@ public class UserServiceImpl implements IUserService {
                 return o1.getId().compareTo(o2.getId());
             }
         });
-
+        int count = orderInfoList.size();
         PageInfo<OrderInfo> pageInfo = new PageInfo<OrderInfo>(orderInfoList);
-        return ServerResponse.createBySuccess(pageInfo.getList());
+        System.out.println(count);
+        return ServerResponse.createBySuccess("",count,pageInfo.getList());
     }
 
 

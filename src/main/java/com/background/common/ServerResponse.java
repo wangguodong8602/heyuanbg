@@ -11,6 +11,7 @@ public class ServerResponse<T> implements Serializable {
 
     private int code;
     private String msg;
+    private int count;
     private T data;
 
     private ServerResponse(int code){
@@ -29,6 +30,12 @@ public class ServerResponse<T> implements Serializable {
         this.code = code;
         this.msg = msg;
     }
+    private ServerResponse(int code,String msg,int count,T data){
+        this.code = code;
+        this.msg = msg;
+        this.count = count;
+        this.data = data;
+    }
 
     @JsonIgnore
     //使之不在json序列化结果当中
@@ -41,6 +48,7 @@ public class ServerResponse<T> implements Serializable {
     public String getMsg(){
         return msg;
     }
+    public int getCount(){return  count;}
     public T getData(){
         return data;
     }
@@ -56,6 +64,9 @@ public class ServerResponse<T> implements Serializable {
     }
     public static <T> ServerResponse<T> createBySuccess(String msg,T data){
         return new ServerResponse<T>(ResponseCode.SUCCESS.getCode(),msg,data);
+    }
+    public static <T> ServerResponse<T> createBySuccess(String msg,int count,T data){
+        return new ServerResponse<T>(ResponseCode.SUCCESS.getCode(),msg,count,data);
     }
 
     public static <T> ServerResponse<T> createByError(){

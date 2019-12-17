@@ -28,7 +28,7 @@
 				<a href="javascript:;" class="iconfont hideMenu icon-menu1"></a>
 				<!-- 顶部右侧菜单 -->
 				<ul class="layui-nav top_menu">
-					<li class="layui-nav-item"><label>欢迎 ${currentUser.realname } 登录该系统~</label></li>
+					<li class="layui-nav-item"><label>欢迎 ${currentUser.realname } 登录系统~</label></li>
 					<li class="layui-nav-item"><a href="${ctx }/user/logout.do"
 						class="signOut"><i class="iconfont icon-loginout"></i><cite>退出</cite></a>
 					</li>
