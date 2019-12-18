@@ -348,6 +348,10 @@ public class OrderServiceImpl implements IOrderService {
                 Thread.sleep(3000);
                 Map<String, String> data = new HashMap<>(16);
                 data.put("out_trade_no", out_trade_no);
+                map.put("sub_mch_id","1569327041");
+                map.put("nonce_str", WXPayUtil.generateNonceStr());
+                sign = WXPayUtil.generateSignature(map, config.getKey());
+                map.put("sign", sign);
                 //调用微信的查询接口
                 Map<String, String> orderQuery = wxpay.orderQuery(data);
                 String orderResp = WXPayUtil.mapToXml(orderQuery);
