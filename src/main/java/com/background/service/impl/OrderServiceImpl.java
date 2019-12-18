@@ -367,6 +367,7 @@ public class OrderServiceImpl implements IOrderService {
                         trade_state = element.getTextTrim();
                     }
                 }
+                log.info(trade_state);
                 if(PAY_SUCCESS.equals(trade_state)){
                     log.info("微信加密支付成功！");
                     return ServerResponse.createBySuccessMessage(PAY_SUCCESS);
