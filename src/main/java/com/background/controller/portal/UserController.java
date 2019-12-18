@@ -162,7 +162,7 @@ public class UserController {
 
     @RequestMapping(value = "/get_order_list.do",method = RequestMethod.GET)
     @ResponseBody
-    public ServerResponse<User> getOrderList(HttpSession session, @RequestParam(value = "pageNum",defaultValue = "1") int pageNum, @RequestParam(value = "pageSize",defaultValue = "10") int pageSize, OrderSearch orderSearch){
+    public ServerResponse<User> getOrderList(HttpSession session, @RequestParam(value = "page",defaultValue = "1") int pageNum, @RequestParam(value = "limit",defaultValue = "10") int pageSize, OrderSearch orderSearch){
         User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
         if(currentUser == null){
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"未登录，需要强制登录status=10");

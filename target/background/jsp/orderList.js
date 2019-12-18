@@ -85,8 +85,8 @@ layui.use([ 'form','layer','jquery','table','laydate'], function() {
         id:'orderList'
         ,elem: '#orderList'
         ,url: ctx+'/user/get_order_list.do'// 数据接口
-        //,limit:10// 每页默认数
-        //,limits:[10,20,30,40]
+        ,limit:10// 每页默认数
+        ,limits:[10,20,30,40]
         ,cols: [[
             {field: 'id', title: 'ID',align:'center',width:100}
             ,{field: 'username', title: '商家',align:'center', width:200}

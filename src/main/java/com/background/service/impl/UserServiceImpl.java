@@ -309,7 +309,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     public ServerResponse getOrderList(int userID, int pageNum, int pageSize, OrderSearch orderSearch){
-        PageHelper.startPage(pageNum,pageSize);
+
         Set<User> userSet = Sets.newHashSet();
         findShopperChildUser(userSet,userID);
         List<User> userList = Lists.newArrayList();
@@ -346,8 +346,40 @@ public class UserServiceImpl implements IUserService {
         List<OrderInfo> orderInfoList = Lists.newArrayList();
         Set<OrderInfo> orderInfoSet = Sets.newHashSet();
         Set<Integer> idSet = new HashSet<Integer>();
+
+        PageHelper.startPage(pageNum,pageSize);
+        List<PayOrder> orderList = payOrderMapper.selectOrderByUserList(userList,startTime,endTime);
+        for(PayOrder orderItem : orderList){
+            PayInfo payInfo = payInfoMapper.selectByOrderNo(orderItem.getOrderNo());
+            User userHost = userMapper.selectByPrimaryKey(orderItem.getUserId());
+            User userAgent = userMapper.selectByPrimaryKey(userHost.getParentId());
+            Shopper shopper = shopperMapper.selectByUserId(userHost.getId());
+            String plateform;
+            if(payInfo.getPayPlatform()==1){
+                plateform = "支付宝";
+            }else if(payInfo.getPayPlatform() == 2){
+                plateform = "微信";
+            }else if(payInfo.getPayPlatform() == 3){
+                plateform = "云闪付";
+            }else{
+                plateform = "未知平台";
+            }
+            OrderInfo orderInfo = new OrderInfo();
+            orderInfo.setId(orderItem.getId());
+            orderInfo.setOrderNo(orderItem.getOrderNo());
+            orderInfo.setUsername(userHost.getRealname());
+            orderInfo.setAgentname(userAgent.getRealname());
+            orderInfo.setShoppername(shopper.getShoppername());
+            orderInfo.setPayment(orderItem.getPayment());
+            orderInfo.setPayPlatform(plateform);
+            orderInfo.setUpdateTime(orderItem.getUpdateTime());
+            if(!idSet.contains(orderInfo.getId())){
+                idSet.add(orderInfo.getId());
+                orderInfoSet.add(orderInfo);
+            }
+        }
+        /**
         for(User userItem : userList){
-            PayOrder newOrder = payOrderMapper.selectByPrimaryKey(1);
             List<PayOrder> orderList = payOrderMapper.selectOrderByCondition(userItem.getId(),startTime,endTime);
             if(orderList == null){
                 continue;
@@ -383,6 +415,7 @@ public class UserServiceImpl implements IUserService {
             }
 
         }
+         */
         for(OrderInfo orderInfoIten:orderInfoSet){
             orderInfoList.add(orderInfoIten);
         }
@@ -394,9 +427,9 @@ public class UserServiceImpl implements IUserService {
                 return o1.getId().compareTo(o2.getId());
             }
         });
-        int count = orderInfoList.size();
-        PageInfo<OrderInfo> pageInfo = new PageInfo<OrderInfo>(orderInfoList);
-        System.out.println(count);
+        PageInfo pageInfo = new PageInfo(orderList);
+        pageInfo.setList(orderInfoList);
+        int count=(int)pageInfo.getTotal();
         return ServerResponse.createBySuccess("",count,pageInfo.getList());
     }
 

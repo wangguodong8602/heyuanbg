@@ -286,7 +286,7 @@ public class OrderServiceImpl implements IOrderService {
         WXPay wxpay = new WXPay(config);
         String out_trade_no = DateUtil.getCurrentTime();
         Map<String, String> map = new HashMap<>(16);
-        map.put("sub_mch_id","1569327041");
+
         map.put("attach", "订单额外描述");
         map.put("auth_code", barCode);
         map.put("body", "付款码支付测试");
@@ -298,6 +298,7 @@ public class OrderServiceImpl implements IOrderService {
         //生成签名
         String sign = WXPayUtil.generateSignature(map, config.getKey());
         map.put("sign", sign);
+        map.put("sub_mch_id","1569327041");
         String mapToXml = null;
         try {
             //调用微信的扫码支付接口

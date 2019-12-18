@@ -165,4 +165,18 @@
       </if>
     </where>
   </select>
+
+  <select id="selectOrderByUserList" resultMap="BaseResultMap" parameterType="map">
+    select <include refid="Base_Column_List"/>
+    from pay_order
+    <where>
+      user_id in 
+      <foreach collection="userList" index="index" item="item" separator="," open="(" close=")">
+        (#{item.id})
+      </foreach>
+      <if test="null != startTime and  null != endTime">
+        and update_time between #{startTime} and #{endTime}
+      </if>
+    </where>
+  </select>
 </mapper>
