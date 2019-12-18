@@ -304,6 +304,7 @@ public class OrderServiceImpl implements IOrderService {
             //调用微信的扫码支付接口
             Map<String, String> resp = wxpay.microPay(map);
             mapToXml = WXPayUtil.mapToXml(resp);
+            log.info(mapToXml);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("微信支付失败"+ e);
