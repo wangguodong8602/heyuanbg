@@ -28,6 +28,7 @@ import com.background.pojo.*;
 import com.background.service.IOrderService;
 import com.background.util.DateUtil;
 import com.github.wxpay.sdk.WXPay;
+import com.github.wxpay.sdk.WXPayConstants;
 import com.github.wxpay.sdk.WXPayUtil;
 import net.sf.jsqlparser.schema.Server;
 import org.apache.avro.LogicalTypes;
@@ -355,7 +356,9 @@ public class OrderServiceImpl implements IOrderService {
                 //调用微信的查询接口
                 Map<String, String> orderQuery = wxpay.orderQuery(data);
                 String orderResp = WXPayUtil.mapToXml(orderQuery);
+                log.info("orderResp:"+orderResp);
                 String trade_state = null;
+
                 //获取Document对象
                 Document orderDoc = DocumentHelper.parseText(orderResp);
                 //获取对象的根节点<xml>
