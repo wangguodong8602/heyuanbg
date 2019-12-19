@@ -171,7 +171,7 @@ public class OrderServiceImpl implements IOrderService {
     public ServerResponse zfbPay(String bizNo,String barCode, String codeType, String deviceSn, String totalAmount){
         // (必填) 商户网站订单系统中唯一订单号，64个字符以内，只能包含字母、数字、下划线，
         // 需保证商户系统端不能重复，建议通过数据库sequence生成，
-        String outTradeNo = "hycpay" + System.currentTimeMillis()
+        String outTradeNo = ""+System.currentTimeMillis()
                 + (long) (Math.random() * 10000000L);
         //String outTradeNo = bizNo;
 
@@ -357,7 +357,7 @@ public class OrderServiceImpl implements IOrderService {
         log.info(totalAmount);
         String totalAmountNew = String.valueOf((int)(Double.valueOf(totalAmount) * 100));
         log.info(totalAmountNew);
-        String outTradeNo = "hycpay" + System.currentTimeMillis()
+        String outTradeNo = "" + System.currentTimeMillis()
                 + (long) (Math.random() * 10000000L);
         Device device = deviceMapper.selectBySN(deviceSn);
         Shopper shopper = shopperMapper.selectByUserId(device.getUserId());
