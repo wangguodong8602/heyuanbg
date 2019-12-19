@@ -273,7 +273,6 @@ public class OrderServiceImpl implements IOrderService {
                 payOrder.setPaymentTime(new Date());
                 payOrder.setEndTime(new Date());
                 payOrder.setCloseTime(new Date());
-
                 PayInfo payInfo = new PayInfo();
                 payInfo.setOrderNo(Long.parseLong(outTradeNo));
                 payInfo.setUserId(shopper.getUserId());
@@ -293,17 +292,14 @@ public class OrderServiceImpl implements IOrderService {
                 log.info("支付宝支付成功: )");
                 resultString = "支付成功";
                 break;
-
             case FAILED:
                 log.error("支付宝支付失败!!!");
                 resultString = "支付失败";
                 break;
-
             case UNKNOWN:
                 log.error("系统异常，订单状态未知!!!");
                 resultString = "支付失败";
                 break;
-
             default:
                 log.error("不支持的交易状态，交易返回异常!!!");
                 resultString = "支付失败";
@@ -316,7 +312,7 @@ public class OrderServiceImpl implements IOrderService {
 
 
         log.info(totalAmount);
-        String totalAmountNew = String.valueOf(Double.valueOf(totalAmount) * 100);
+        String totalAmountNew = String.valueOf((int)(Double.valueOf(totalAmount) * 100));
         log.info(totalAmountNew);
         String outTradeNo = "hycpay" + System.currentTimeMillis()
                 + (long) (Math.random() * 10000000L);
