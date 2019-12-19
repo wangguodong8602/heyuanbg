@@ -265,6 +265,7 @@ public class OrderServiceImpl implements IOrderService {
         log.info(result.getTradeStatus().getClass().getName());
 
         if("SUCCESS".equals(result.getTradeStatus().toString())){
+            log.info("进入SUCCESS!!!");
             PayOrder payOrder = new PayOrder();
             payOrder.setOrderNo(Long.parseLong(outTradeNo));
             payOrder.setUserId(shopper.getUserId());
@@ -273,6 +274,7 @@ public class OrderServiceImpl implements IOrderService {
             payOrder.setPaymentTime(new Date());
             payOrder.setEndTime(new Date());
             payOrder.setCloseTime(new Date());
+            log.info("payOrder参数完毕！！");
             PayInfo payInfo = new PayInfo();
             payInfo.setOrderNo(Long.parseLong(outTradeNo));
             payInfo.setUserId(shopper.getUserId());
@@ -286,9 +288,10 @@ public class OrderServiceImpl implements IOrderService {
             }
             payInfo.setPlatformNumber(result.getResponse().getOutTradeNo());
             payInfo.setPlatformStatus("10");
-
+            log.info("参数都设置完毕！！！");
             payOrderMapper.insert(payOrder);
             payInfoMapper.insert(payInfo);
+            log.info("插入数据库成功！！！");
             log.info("支付宝支付成功!!!");
             resultString = "支付成功";
         }else if("FAILED".equals(result.getTradeStatus().toString())){
