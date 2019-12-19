@@ -135,9 +135,14 @@ public class OrderServiceImpl implements IOrderService {
         HashMap<String,String> map = new HashMap<>();
         AlipayOpenAuthTokenAppResponse response =alipayClient.execute(request);
         log.info(response.getBody());
+        int index = response.getBody().indexOf("app_auth_token");
+        String appAuthToken = response.getBody().substring(index+17,index+57);
+        index = response.getBody().indexOf("user_id");
+        String userId = response.getBody().substring(index+10,index+26);
         if(response.isSuccess()){
-            map.put("账户ID",response.getUserId());
-            map.put("授权码",response.getAppAuthToken());
+            log.info(response.getAppAuthToken());
+            map.put("账户ID",userId);
+            map.put("授权码",appAuthToken);
             return ServerResponse.createBySuccess("授权成功",map);
         }else{
             return ServerResponse.createByErrorMessage("授权失败");
