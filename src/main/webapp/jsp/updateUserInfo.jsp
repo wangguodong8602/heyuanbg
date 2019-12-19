@@ -116,7 +116,7 @@ pageEncoding="UTF-8"%>
 			}else if(res.data.role == 2){
 				document.getElementById("role").value = "二级代理员";
 			}else if(res.data.role == 3){
-				document.getElementById("role").value = "三级级代理员";
+				document.getElementById("role").value = "三级代理员";
 			}else{
 				document.getElementById("role").value = "商户";
 			}

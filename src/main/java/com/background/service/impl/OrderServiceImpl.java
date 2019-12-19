@@ -260,6 +260,7 @@ public class OrderServiceImpl implements IOrderService {
         //System.out.println(result.toString());
         String resultString;
 
+        log.info(result.getResponse().getBody());
         log.info(result.getTradeStatus().toString());
         log.info(result.getTradeStatus().getClass().getName());
 
