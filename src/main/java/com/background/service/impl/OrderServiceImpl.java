@@ -259,6 +259,10 @@ public class OrderServiceImpl implements IOrderService {
         //System.out.println(result);
         //System.out.println(result.toString());
         String resultString;
+
+        log.info(result.getTradeStatus().toString());
+        log.info(result.getTradeStatus().getClass().getName());
+
         switch (result.getTradeStatus()) {
             case SUCCESS:
                 PayOrder payOrder = new PayOrder();
@@ -310,7 +314,10 @@ public class OrderServiceImpl implements IOrderService {
 
     public ServerResponse wxPay(String bizNo,String barCode, String codeType, String deviceSn, String totalAmount) throws Exception {
 
+
+        log.info(totalAmount);
         String totalAmountNew = String.valueOf(Double.valueOf(totalAmount) * 100);
+        log.info(totalAmountNew);
         String outTradeNo = "hycpay" + System.currentTimeMillis()
                 + (long) (Math.random() * 10000000L);
         Device device = deviceMapper.selectBySN(deviceSn);
