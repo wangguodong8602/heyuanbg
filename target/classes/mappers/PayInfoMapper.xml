@@ -15,7 +15,7 @@
     </constructor>
   </resultMap>
   <sql id="Base_Column_List" >
-    id, user_id, order_no, pay_platform, platform_number, platform_status, create_time, 
+    id, user_id, order_no, pay_platform, platform_number, platform_status, create_time,
     update_time, pay_type
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
@@ -35,7 +35,7 @@
       )
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{orderNo,jdbcType=BIGINT}, 
       #{payPlatform,jdbcType=INTEGER}, #{platformNumber,jdbcType=VARCHAR}, #{platformStatus,jdbcType=VARCHAR}, 
-      #{createTime,jdbcType=TIMESTAMP}, now(), now()
+      now(), now(), #{payType,jdbcType=INTEGER}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.background.pojo.PayInfo" >
