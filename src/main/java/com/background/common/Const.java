@@ -19,6 +19,7 @@ public class Const {
     public static final String WX_APPID = "wxbdf7ff4b39ae0b75";
     public static final String WX_KEY = "WANG1993GUOO1994DONG0208HUAA0208";
     public static final String MCH_ID = "1566079171";
+    public static final String IP = "182.92.169.18";
 
     public interface ProductListOrderBy{
         Set<String> PRICE_ASC_DESC = Sets.newHashSet("price_desc","price_asc");

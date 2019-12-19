@@ -32,6 +32,7 @@ import com.github.wxpay.sdk.WXPayConstants;
 import com.github.wxpay.sdk.WXPayUtil;
 import net.sf.jsqlparser.schema.Server;
 import org.apache.avro.LogicalTypes;
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -153,12 +154,26 @@ public class OrderServiceImpl implements IOrderService {
      * @return
      */
 
-    public ServerResponse pay(String bizNo,String barCode, String codeType, String deviceSn, String totalAmount){
+    public ServerResponse pay(String bizNo,String barCode, String codeType, String deviceSn, String totalAmount)throws Exception{
+        if(StringUtils.isEmpty(barCode)){
+            return ServerResponse.createByErrorMessage("付款码出错！");
+        }
+        String subString = barCode.substring(0,2);
+        if("10".equals(subString) || "11".equals(subString) || "12".equals(subString) || "13".equals(subString) || "14".equals(subString) || "15".equals(subString)){
+            return wxPay(bizNo,barCode,codeType,deviceSn,totalAmount);
+        }else if("25".equals(subString) || "26".equals(subString) || "27".equals(subString) || "28".equals(subString) || "29".equals(subString) || "30".equals(subString)){
+            return zfbPay(bizNo,barCode,codeType,deviceSn,totalAmount);
+        }else{
+            return ServerResponse.createByErrorMessage("付款码出错！");
+        }
+    }
+
+    public ServerResponse zfbPay(String bizNo,String barCode, String codeType, String deviceSn, String totalAmount){
         // (必填) 商户网站订单系统中唯一订单号，64个字符以内，只能包含字母、数字、下划线，
         // 需保证商户系统端不能重复，建议通过数据库sequence生成，
-        //String outTradeNo = "tradepay" + System.currentTimeMillis()
-        //        + (long) (Math.random() * 10000000L);
-        String outTradeNo = bizNo;
+        String outTradeNo = "hycpay" + System.currentTimeMillis()
+                + (long) (Math.random() * 10000000L);
+        //String outTradeNo = bizNo;
 
         Device device = deviceMapper.selectBySN(deviceSn);
         Shopper shopper = shopperMapper.selectByUserId(device.getUserId());
@@ -181,12 +196,12 @@ public class OrderServiceImpl implements IOrderService {
 
         // (可选) 订单不可打折金额，可以配合商家平台配置折扣活动，如果酒水不参与打折，则将对应金额填写至此字段
         // 如果该值未传入,但传入了【订单总金额】,【打折金额】,则该值默认为【订单总金额】-【打折金额】
-        String undiscountableAmount = "0.0";
+        //String undiscountableAmount = "0.0";
 
         // 卖家支付宝账号ID，用于支持一个签约账号下支持打款到不同的收款账号，(打款到sellerId对应的支付宝账号)
         // 如果该字段为空，则默认为与支付宝签约的商户的PID，也就是appid对应的PID
-        //String sellerId = "";
-        String sellerId = "2088912095293655";
+        String sellerId = shopper.getZfbId();
+        //String sellerId = "2088912095293655";
 
         // 订单描述，可以对交易或商品进行一个详细地描述，比如填写"购买商品3件共20.00元"
         String body = "购买商品共"+totalAmount+"元";
@@ -195,8 +210,8 @@ public class OrderServiceImpl implements IOrderService {
         //String operatorId = "test_operator_id";
 
         // (必填) 商户门店编号，通过门店号和商家后台可以配置精准到门店的折扣信息，详询支付宝技术支持
-        String storeId = "201999998887777";
-        //String storeId = shopper.getId().toString()+"-"+shopper.getUserId().toString()+"-"+shopper.getAgentId().toString();
+        //String storeId = "201999998887777";
+        String storeId = shopper.getId().toString()+"-"+shopper.getUserId().toString()+"-"+shopper.getAgentId().toString();
 
         // 业务扩展参数，目前可添加由支付宝分配的系统商编号(通过setSysServiceProviderId方法)，详情请咨询支付宝技术支持
         String providerId = "2088631598114491";
@@ -218,7 +233,8 @@ public class OrderServiceImpl implements IOrderService {
         //goodsDetailList.add(goods2);
 
         //String appAuthToken = "应用授权令牌";//根据真实值填写
-        String appAuthToken = "201912BBbe1c26617d784bdd963923710f77fD65";
+        //String appAuthToken = "201912BBbe1c26617d784bdd963923710f77fD65";
+        String appAuthToken = shopper.getAuthcode();
 
         // 创建条码支付请求builder，设置请求参数
         AlipayTradePayRequestBuilder builder = new AlipayTradePayRequestBuilder()
@@ -228,7 +244,7 @@ public class OrderServiceImpl implements IOrderService {
                 .setAuthCode(authCode)
                 .setTotalAmount(totalAmount)
                 .setStoreId(storeId)
-                .setUndiscountableAmount(undiscountableAmount)
+                //.setUndiscountableAmount(undiscountableAmount)
                 .setBody(body)
                 //.setOperatorId(operatorId)
                 .setExtendParams(extendParams)
@@ -236,66 +252,85 @@ public class OrderServiceImpl implements IOrderService {
                 //.setGoodsDetailList(goodsDetailList)
                 .setTimeoutExpress(timeoutExpress);
 
-        PayOrder payOrder = new PayOrder();
-        payOrder.setOrderNo(Long.parseLong(bizNo));
-        payOrder.setUserId(shopper.getUserId());
-        payOrder.setPayment(BigDecimal.valueOf(Double.valueOf(totalAmount)));
-        payOrder.setStatus(10);
-        payOrder.setPaymentTime(new Date());
-        payOrder.setEndTime(new Date());
-        payOrder.setCloseTime(new Date());
-
-        PayInfo payInfo = new PayInfo();
-        payInfo.setOrderNo(Long.parseLong(bizNo));
-        payInfo.setUserId(shopper.getUserId());
-        payInfo.setPayPlatform(1);
-        payInfo.setPayType(1);
-        payInfo.setPlatformNumber("15596662963");
-        payInfo.setPlatformStatus("10");
-
-        payOrderMapper.insert(payOrder);
-        payInfoMapper.insert(payInfo);
-
         // 调用tradePay方法获取当面付应答
         AlipayF2FPayResult result = tradeService.tradePay(builder);
-        log.info(result.toString());
-        log.info(result.getResponse().getBody());
-        System.out.println(result);
-        System.out.println(result.toString());
+        //log.info(result.toString());
+        //log.info(result.getResponse().getBody());
+        //System.out.println(result);
+        //System.out.println(result.toString());
+        String resultString;
         switch (result.getTradeStatus()) {
             case SUCCESS:
+                PayOrder payOrder = new PayOrder();
+                payOrder.setOrderNo(Long.parseLong(outTradeNo));
+                payOrder.setUserId(shopper.getUserId());
+                payOrder.setPayment(BigDecimal.valueOf(Double.valueOf(totalAmount)));
+                payOrder.setStatus(10);
+                payOrder.setPaymentTime(new Date());
+                payOrder.setEndTime(new Date());
+                payOrder.setCloseTime(new Date());
+
+                PayInfo payInfo = new PayInfo();
+                payInfo.setOrderNo(Long.parseLong(outTradeNo));
+                payInfo.setUserId(shopper.getUserId());
+                payInfo.setPayPlatform(1);
+                if("C".equals(codeType)){
+                    payInfo.setPayType(1);
+                }else if("F".equals(codeType)){
+                    payInfo.setPayType(2);
+                }else{
+                    payInfo.setPayType(1);
+                }
+                payInfo.setPlatformNumber(result.getResponse().getOutTradeNo());
+                payInfo.setPlatformStatus("10");
+
+                payOrderMapper.insert(payOrder);
+                payInfoMapper.insert(payInfo);
                 log.info("支付宝支付成功: )");
+                resultString = "支付成功";
                 break;
 
             case FAILED:
                 log.error("支付宝支付失败!!!");
+                resultString = "支付失败";
                 break;
 
             case UNKNOWN:
                 log.error("系统异常，订单状态未知!!!");
+                resultString = "支付失败";
                 break;
 
             default:
                 log.error("不支持的交易状态，交易返回异常!!!");
+                resultString = "支付失败";
                 break;
         }
-        return null;
+        return ServerResponse.createBySuccessMessage(resultString);
     }
 
-    public ServerResponse scanCodeToPay(String barCode) throws Exception {
+    public ServerResponse wxPay(String bizNo,String barCode, String codeType, String deviceSn, String totalAmount) throws Exception {
+
+        String totalAmountNew = String.valueOf(Double.valueOf(totalAmount) * 100);
+        String outTradeNo = "hycpay" + System.currentTimeMillis()
+                + (long) (Math.random() * 10000000L);
+        Device device = deviceMapper.selectBySN(deviceSn);
+        Shopper shopper = shopperMapper.selectByUserId(device.getUserId());
+
+        String subject = shopper.getShoppername()+"微信消费";
+
         MyConfig config = new MyConfig();
         WXPay wxpay = new WXPay(config);
         String out_trade_no = DateUtil.getCurrentTime();
         Map<String, String> map = new HashMap<>(16);
-        map.put("sub_mch_id","1569327041");
-        map.put("attach", "订单额外描述");
+        map.put("sub_mch_id",shopper.getWxId());
+        map.put("attach", subject);
         map.put("auth_code", barCode);
-        map.put("body", "付款码支付测试");
-        map.put("device_info", "1000");
+        map.put("body", "购买商品共"+totalAmount+"元.");
+        map.put("device_info", deviceSn);
         map.put("nonce_str", WXPayUtil.generateNonceStr());
-        map.put("out_trade_no", out_trade_no);
-        map.put("spbill_create_ip", "113.201.51.199");
-        map.put("total_fee", "1");
+        map.put("out_trade_no", outTradeNo);
+        map.put("spbill_create_ip", Const.IP);
+        map.put("total_fee", totalAmountNew);
         //生成签名
         String sign = WXPayUtil.generateSignature(map, config.getKey());
         map.put("sign", sign);
@@ -343,7 +378,29 @@ public class OrderServiceImpl implements IOrderService {
         }
         if(PAY_SUCCESS.equals(return_code) && PAY_SUCCESS.equals(result_code)){
             log.info("微信免密支付成功！");
-            return ServerResponse.createBySuccessMessage(PAY_SUCCESS);
+
+            PayOrder payOrder = new PayOrder();
+            payOrder.setOrderNo(Long.parseLong(outTradeNo));
+            payOrder.setUserId(shopper.getUserId());
+            payOrder.setPayment(BigDecimal.valueOf(Double.valueOf(totalAmount)));
+            payOrder.setStatus(10);
+            payOrder.setPaymentTime(new Date());
+            payOrder.setEndTime(new Date());
+            payOrder.setCloseTime(new Date());
+
+            PayInfo payInfo = new PayInfo();
+            payInfo.setOrderNo(Long.parseLong(outTradeNo));
+            payInfo.setUserId(shopper.getUserId());
+            payInfo.setPayPlatform(2);
+            payInfo.setPayType(1);
+
+            payInfo.setPlatformNumber(outTradeNo);
+            payInfo.setPlatformStatus("10");
+
+            payOrderMapper.insert(payOrder);
+            payInfoMapper.insert(payInfo);
+
+            return ServerResponse.createBySuccessMessage("支付成功！");
         } else if (PAY_USERPAYING.equals(err_code)){
             for(int i = 0; i < 4; i++){
                 Thread.sleep(3000);
@@ -373,12 +430,35 @@ public class OrderServiceImpl implements IOrderService {
                 log.info(trade_state);
                 if(PAY_SUCCESS.equals(trade_state)){
                     log.info("微信加密支付成功！");
-                    return ServerResponse.createBySuccessMessage(PAY_SUCCESS);
+
+                    PayOrder payOrder = new PayOrder();
+                    payOrder.setOrderNo(Long.parseLong(outTradeNo));
+                    payOrder.setUserId(shopper.getUserId());
+                    payOrder.setPayment(BigDecimal.valueOf(Double.valueOf(totalAmount)));
+                    payOrder.setStatus(10);
+                    payOrder.setPaymentTime(new Date());
+                    payOrder.setEndTime(new Date());
+                    payOrder.setCloseTime(new Date());
+
+                    PayInfo payInfo = new PayInfo();
+                    payInfo.setOrderNo(Long.parseLong(outTradeNo));
+                    payInfo.setUserId(shopper.getUserId());
+                    payInfo.setPayPlatform(2);
+                    payInfo.setPayType(1);
+
+                    payInfo.setPlatformNumber(outTradeNo);
+                    payInfo.setPlatformStatus("10");
+
+                    payOrderMapper.insert(payOrder);
+                    payInfoMapper.insert(payInfo);
+
+                    return ServerResponse.createBySuccessMessage("支付成功！");
+
                 }
                 log.info("正在支付" + orderResp);
             }
         }
         log.error("微信支付失败！");
-        return ServerResponse.createByErrorMessage(err_code_des);
+        return ServerResponse.createByErrorMessage("支付失败！");
     }
 }

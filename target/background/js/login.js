@@ -13,6 +13,7 @@
 
 		$('#loginBt').on('click', function() {
 			var code = $('#code').val();
+			code = code.toLowerCase();
 			var username = $('#username').val();
 			var password = $('#password').val();
 			var num = show_num.join("");

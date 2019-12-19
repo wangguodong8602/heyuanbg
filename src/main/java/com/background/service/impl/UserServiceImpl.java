@@ -12,6 +12,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -311,18 +312,11 @@ public class UserServiceImpl implements IUserService {
     public ServerResponse getOrderList(int userID, int pageNum, int pageSize, OrderSearch orderSearch){
 
         Set<User> userSet = Sets.newHashSet();
-        findShopperChildUser(userSet,userID);
+        findShopperChildUser(userSet,userID);  //获取所有的子用户到userSet中
         List<User> userList = Lists.newArrayList();
         for(User userItem : userSet){
             userList.add(userItem);
         }
-        Collections.sort(userList, new Comparator<User>() {
-            @Override
-            public int compare(User o1, User o2) {
-                //升序
-                return o1.getId().compareTo(o2.getId());
-            }
-        });
         SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String startTime;
         String endTime;
@@ -344,11 +338,20 @@ public class UserServiceImpl implements IUserService {
         }
          **/
         List<OrderInfo> orderInfoList = Lists.newArrayList();
-        Set<OrderInfo> orderInfoSet = Sets.newHashSet();
-        Set<Integer> idSet = new HashSet<Integer>();
+        Set<Integer> idSet = new HashSet<Integer>();   //用来存放payOrder的id的集合
+        List<Integer> idList = Lists.newArrayList();
 
+
+        List<PayOrder> orderListTemp = payOrderMapper.selectOrderByUserList(userList,startTime,endTime);//通过用户集合获取到所有的订单
+        for(PayOrder orderItem:orderListTemp){
+            if(!idSet.contains(orderItem.getId())){
+                idSet.add(orderItem.getId());
+                idList.add(orderItem.getId());
+            }
+        }
+        Collections.sort(idList);
         PageHelper.startPage(pageNum,pageSize);
-        List<PayOrder> orderList = payOrderMapper.selectOrderByUserList(userList,startTime,endTime);
+        List<PayOrder> orderList = payOrderMapper.selectOrderByIdList(idList);
         for(PayOrder orderItem : orderList){
             PayInfo payInfo = payInfoMapper.selectByOrderNo(orderItem.getOrderNo());
             User userHost = userMapper.selectByPrimaryKey(orderItem.getUserId());
@@ -373,51 +376,8 @@ public class UserServiceImpl implements IUserService {
             orderInfo.setPayment(orderItem.getPayment());
             orderInfo.setPayPlatform(plateform);
             orderInfo.setUpdateTime(orderItem.getUpdateTime());
-            if(!idSet.contains(orderInfo.getId())){
-                idSet.add(orderInfo.getId());
-                orderInfoSet.add(orderInfo);
-            }
-        }
-        /**
-        for(User userItem : userList){
-            List<PayOrder> orderList = payOrderMapper.selectOrderByCondition(userItem.getId(),startTime,endTime);
-            if(orderList == null){
-                continue;
-            }
-            for(PayOrder orderItem : orderList){
-                PayInfo payInfo = payInfoMapper.selectByOrderNo(orderItem.getOrderNo());
-                User userHost = userMapper.selectByPrimaryKey(orderItem.getUserId());
-                User userAgent = userMapper.selectByPrimaryKey(userHost.getParentId());
-                Shopper shopper = shopperMapper.selectByUserId(userHost.getId());
-                String plateform;
-                if(payInfo.getPayPlatform()==1){
-                    plateform = "支付宝";
-                }else if(payInfo.getPayPlatform() == 2){
-                    plateform = "微信";
-                }else if(payInfo.getPayPlatform() == 3){
-                    plateform = "云闪付";
-                }else{
-                    plateform = "未知平台";
-                }
-                OrderInfo orderInfo = new OrderInfo();
-                orderInfo.setId(orderItem.getId());
-                orderInfo.setOrderNo(orderItem.getOrderNo());
-                orderInfo.setUsername(userHost.getRealname());
-                orderInfo.setAgentname(userAgent.getRealname());
-                orderInfo.setShoppername(shopper.getShoppername());
-                orderInfo.setPayment(orderItem.getPayment());
-                orderInfo.setPayPlatform(plateform);
-                orderInfo.setUpdateTime(orderItem.getUpdateTime());
-                if(!idSet.contains(orderInfo.getId())){
-                    idSet.add(orderInfo.getId());
-                    orderInfoSet.add(orderInfo);
-                }
-            }
 
-        }
-         */
-        for(OrderInfo orderInfoIten:orderInfoSet){
-            orderInfoList.add(orderInfoIten);
+            orderInfoList.add(orderInfo);
         }
 
         Collections.sort(orderInfoList, new Comparator<OrderInfo>() {
@@ -429,6 +389,7 @@ public class UserServiceImpl implements IUserService {
         });
         PageInfo pageInfo = new PageInfo(orderList);
         pageInfo.setList(orderInfoList);
+
         int count=(int)pageInfo.getTotal();
         return ServerResponse.createBySuccess("",count,pageInfo.getList());
     }
@@ -474,7 +435,6 @@ public class UserServiceImpl implements IUserService {
         Set<OrderInfo> orderInfoSet = Sets.newHashSet();
         Set<Integer> idSet = new HashSet<Integer>();
         for(User userItem : userList){
-            PayOrder newOrder = payOrderMapper.selectByPrimaryKey(1);
             List<PayOrder> orderList = payOrderMapper.selectOrderByCondition(userItem.getId(),startTime,endTime);
             if(orderList == null){
                 continue;

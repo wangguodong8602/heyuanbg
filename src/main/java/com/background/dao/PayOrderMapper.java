@@ -21,4 +21,6 @@ public interface PayOrderMapper {
     List<PayOrder> selectOrderByCondition(@Param("userID") Integer userID, @Param("startTime") String startTime, @Param("endTime") String endTime);
 
     List<PayOrder> selectOrderByUserList(@Param("userList") List userList, @Param("startTime") String startTime, @Param("endTime") String endTime);
+
+    List<PayOrder> selectOrderByIdList(@Param("idList") List idList);
 }

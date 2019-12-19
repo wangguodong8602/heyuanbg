@@ -35,15 +35,10 @@ public class OrderController {
 
     @RequestMapping(value = "/mini_pay.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse miniPay(String bizNo,String barCode, String codeType, String deviceSn, String totalAmount){
+    public ServerResponse miniPay(String bizNo,String barCode, String codeType, String deviceSn, String totalAmount)throws Exception{
         return iOrderService.pay(bizNo,barCode,codeType,deviceSn,totalAmount);
     }
 
-    @RequestMapping(value = "/pay.do",method = RequestMethod.POST)
-    @ResponseBody
-    public ServerResponse pay(String barCode)throws Exception{
-        return iOrderService.scanCodeToPay(barCode);
-    }
 
     @RequestMapping("alipay_callback.do")
     @ResponseBody

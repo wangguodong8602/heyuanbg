@@ -179,4 +179,15 @@
       </if>
     </where>
   </select>
+
+  <select id="selectOrderByIdList" resultMap="BaseResultMap" parameterType="list">
+    select <include refid="Base_Column_List"/>
+    from pay_order
+    <where>
+      id in
+      <foreach collection="idList" index="index" item="item" separator="," open="(" close=")">
+        (#{item})
+      </foreach>
+    </where>
+  </select>
 </mapper>
