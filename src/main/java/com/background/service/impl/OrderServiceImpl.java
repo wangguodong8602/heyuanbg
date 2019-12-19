@@ -367,7 +367,7 @@ public class OrderServiceImpl implements IOrderService {
 
         MyConfig config = new MyConfig();
         WXPay wxpay = new WXPay(config);
-        String out_trade_no = DateUtil.getCurrentTime();
+        //String out_trade_no = DateUtil.getCurrentTime();
         Map<String, String> map = new HashMap<>(16);
         map.put("sub_mch_id",shopper.getWxId());
         map.put("attach", subject);
@@ -452,7 +452,7 @@ public class OrderServiceImpl implements IOrderService {
             for(int i = 0; i < 4; i++){
                 Thread.sleep(3000);
                 Map<String, String> data = new HashMap<>(16);
-                data.put("out_trade_no", out_trade_no);
+                data.put("out_trade_no", outTradeNo);
                 data.put("sub_mch_id","1569327041");
                 data.put("nonce_str", WXPayUtil.generateNonceStr());
                 sign = WXPayUtil.generateSignature(data, config.getKey());
