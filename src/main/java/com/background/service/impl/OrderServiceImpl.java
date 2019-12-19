@@ -258,12 +258,50 @@ public class OrderServiceImpl implements IOrderService {
         //log.info(result.getResponse().getBody());
         //System.out.println(result);
         //System.out.println(result.toString());
-        String resultString;
+        String resultString = "原始返回信息";
 
         log.info(result.getResponse().getBody());
         log.info(result.getTradeStatus().toString());
         log.info(result.getTradeStatus().getClass().getName());
 
+        if("SUCCESS".equals(result.getTradeStatus().toString())){
+            PayOrder payOrder = new PayOrder();
+            payOrder.setOrderNo(Long.parseLong(outTradeNo));
+            payOrder.setUserId(shopper.getUserId());
+            payOrder.setPayment(BigDecimal.valueOf(Double.valueOf(totalAmount)));
+            payOrder.setStatus(10);
+            payOrder.setPaymentTime(new Date());
+            payOrder.setEndTime(new Date());
+            payOrder.setCloseTime(new Date());
+            PayInfo payInfo = new PayInfo();
+            payInfo.setOrderNo(Long.parseLong(outTradeNo));
+            payInfo.setUserId(shopper.getUserId());
+            payInfo.setPayPlatform(1);
+            if("C".equals(codeType)){
+                payInfo.setPayType(1);
+            }else if("F".equals(codeType)){
+                payInfo.setPayType(2);
+            }else{
+                payInfo.setPayType(1);
+            }
+            payInfo.setPlatformNumber(result.getResponse().getOutTradeNo());
+            payInfo.setPlatformStatus("10");
+
+            payOrderMapper.insert(payOrder);
+            payInfoMapper.insert(payInfo);
+            log.info("支付宝支付成功!!!");
+            resultString = "支付成功";
+        }else if("FAILED".equals(result.getTradeStatus().toString())){
+            log.error("支付宝支付失败!!!");
+            resultString = "支付失败";
+        }else if("UNKNOWN".equals(result.getTradeStatus().toString())){
+            log.error("系统异常，订单状态未知!!!");
+            resultString = "支付失败";
+        }else{
+            log.error("不支持的交易状态，交易返回异常!!!");
+            resultString = "支付失败";
+        }
+        /**
         switch (result.getTradeStatus()) {
             case SUCCESS:
                 PayOrder payOrder = new PayOrder();
@@ -290,7 +328,7 @@ public class OrderServiceImpl implements IOrderService {
 
                 payOrderMapper.insert(payOrder);
                 payInfoMapper.insert(payInfo);
-                log.info("支付宝支付成功: )");
+                log.info("支付宝支付成功!!!");
                 resultString = "支付成功";
                 break;
             case FAILED:
@@ -306,6 +344,7 @@ public class OrderServiceImpl implements IOrderService {
                 resultString = "支付失败";
                 break;
         }
+         */
         return ServerResponse.createBySuccessMessage(resultString);
     }
 
