@@ -5,10 +5,11 @@
 		id:'shoppperList'
 	    ,elem: '#shopperList'
 	    ,url: ctx+'/user/get_shopper_list.do'// 数据接口
+		,method:'post'
 	    ,limit:10// 每页默认数
 	    ,limits:[10,20,30,40]
 	    ,cols: [[
-				{field: 'id', title: 'ID',align:'center',width:50}
+				{field: 'id', title: 'ID',align:'center',width:100}
 				,{field: 'hostname', title: '商家姓名',align:'center', width:90}
 				,{field: 'agentname', title: '代理姓名',align:'center', width:90}
 				,{field: 'shoppername', title: '店铺名称',align:'center', width:90}
@@ -19,7 +20,6 @@
 				,{field: 'address', title: '店铺地址',align:'center', width:100}
 				,{field: 'bussinessLicense', title: '营业执照',align:'center', width:150}
 				,{field: 'authcode', title: '授权码',align:'center', width:150}
-				,{field: 'rate', title: '费率',align:'center', width:80}
 				,{field: 'createTime', title: '创建时间',align:'center',templet : '<div>{{ formatTime(d.createTime,"yyyy-MM-dd hh:mm:ss")}}</div>', width:160}
 				//,{field: 'updateTime', title: '修改时间', align:'center',templet : '<div>{{ formatTime(d.updateTime,"yyyy-MM-dd hh:mm:ss")}}</div>',width:180}
 				,{field: 'right',title: '操作', align:'center', toolbar: "#barDemo"}
@@ -78,7 +78,6 @@
 		var wxId = $('#wxId').val();
 		var ysfId = $('#ysfId').val();
 		var authcode = $('#authcode').val();
-		var rate = $('#rate').val();
 		var id = $('#id').val();
 		$.ajax({
 			type: "post",
@@ -92,7 +91,6 @@
 				wxId:wxId,
 				ysfId:ysfId,
 				authcode:authcode,
-				rate:rate,
 			},
 			dataType:"json",
 			success:function(d){

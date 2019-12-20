@@ -23,15 +23,13 @@ public class Shopper {
 
     private String address;
 
-    private Float rate;
-
     private String bussinessLicense;
 
     private Date createTime;
 
     private Date updateTime;
 
-    public Shopper(Integer id, Integer userId, Integer agentId, String shoppername, String phone, String zfbId, String wxId, String ysfId, String authcode, String address, Float rate, String bussinessLicense, Date createTime, Date updateTime) {
+    public Shopper(Integer id, Integer userId, Integer agentId, String shoppername, String phone, String zfbId, String wxId, String ysfId, String authcode, String address, String bussinessLicense, Date createTime, Date updateTime) {
         this.id = id;
         this.userId = userId;
         this.agentId = agentId;
@@ -42,7 +40,6 @@ public class Shopper {
         this.ysfId = ysfId;
         this.authcode = authcode;
         this.address = address;
-        this.rate = rate;
         this.bussinessLicense = bussinessLicense;
         this.createTime = createTime;
         this.updateTime = updateTime;
@@ -130,14 +127,6 @@ public class Shopper {
 
     public void setAddress(String address) {
         this.address = address == null ? null : address.trim();
-    }
-
-    public Float getRate() {
-        return rate;
-    }
-
-    public void setRate(Float rate) {
-        this.rate = rate;
     }
 
     public String getBussinessLicense() {

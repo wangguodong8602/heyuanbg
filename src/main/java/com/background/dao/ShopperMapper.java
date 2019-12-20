@@ -21,4 +21,6 @@ public interface ShopperMapper {
     List<Shopper> selectShopperByCondition(@Param("userID") Integer userID, @Param("hostID") Integer hostID, @Param("agentID") Integer agentID);
 
     Shopper selectByUserId(Integer userID);
+
+    List<Shopper> selectShopperByIdList(@Param("idList") List idList);
 }

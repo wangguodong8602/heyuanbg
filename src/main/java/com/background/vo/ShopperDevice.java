@@ -23,8 +23,6 @@ public class ShopperDevice {
 
     private String address;
 
-    private Float rate;
-
     private String bussinessLicense;
 
     private String deviceId;
@@ -39,15 +37,7 @@ public class ShopperDevice {
 
     private Date updateTime;
 
-    public Float getRate() {
-        return rate;
-    }
-
-    public void setRate(Float rate) {
-        this.rate = rate;
-    }
-
-    public ShopperDevice(Integer id, Integer userId, Integer agentId, String shoppername, String phone, String zfbId, String wxId, String ysfId, String authcode, String address, Float rate, String bussinessLicense, String deviceId, String deviceKey, String deviceType, String activeCode, Date createTime, Date updateTime) {
+    public ShopperDevice(Integer id, Integer userId, Integer agentId, String shoppername, String phone, String zfbId, String wxId, String ysfId, String authcode, String address, String bussinessLicense, String deviceId, String deviceKey, String deviceType, String activeCode, Date createTime, Date updateTime) {
         this.id = id;
         this.userId = userId;
         this.agentId = agentId;
@@ -58,7 +48,6 @@ public class ShopperDevice {
         this.ysfId = ysfId;
         this.authcode = authcode;
         this.address = address;
-        this.rate = rate;
         this.bussinessLicense = bussinessLicense;
         this.deviceId = deviceId;
         this.deviceKey = deviceKey;

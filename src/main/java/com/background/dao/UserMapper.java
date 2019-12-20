@@ -39,4 +39,6 @@ public interface UserMapper {
     List<User> selectUserChildrenByParentId(@Param("userID") Integer userID,@Param("realname") String realname,@Param("role") Integer role);
 
     User selectByRealname(String realname);
+
+    List<User> selectUserByIdList(@Param("idList") List idList);
 }

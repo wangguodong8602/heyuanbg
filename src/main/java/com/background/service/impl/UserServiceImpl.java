@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -167,6 +168,28 @@ public class UserServiceImpl implements IUserService {
         return ServerResponse.createByErrorMessage("密码更新失败！");
     }
 
+    public ServerResponse<String> refreshPassword(Integer currUserId,Integer id){
+        //防止横向越权，要校验一下这个用户的旧密码，一定要指定是这个用户，因为我们会查询一个count(1)，如果不指定id,那么结果就是true啦
+        Set<User> userSet = Sets.newHashSet();
+        findChildUser(userSet,currUserId);
+        Set<Integer> idSet = Sets.newHashSet();
+        for(User userItem:userSet){
+            idSet.add(userItem.getId());
+        }
+        if(!idSet.contains(id)){
+            return  ServerResponse.createByErrorMessage("对不起，权限不足！");
+        }else{
+            User user = userMapper.selectByPrimaryKey(id);
+            user.setPassword(MD5Util.MD5EncodeUtf8("123456"));
+            int updateCount = userMapper.updateByPrimaryKeySelective(user);
+            if(updateCount > 0){
+                return ServerResponse.createBySuccessMessage("密码重置成功！");
+            }
+            return ServerResponse.createByErrorMessage("密码重置失败！");
+        }
+
+    }
+
     public ServerResponse<User> updateInformation(User user){
         //username是不能被更新的
         //phone也要进行一个校验，校验新的phone是不是已经存在，并且存在的phone如果相同的话，不能是我们当前的这个用户的
@@ -218,34 +241,38 @@ public class UserServiceImpl implements IUserService {
     }
 
     public ServerResponse getUserList(int userID, int pageNum, int pageSize, UserSearch userSearch){
-        PageHelper.startPage(pageNum,pageSize);
         Set<User> userSet = Sets.newHashSet();
         findChildUser(userSet,userID,userSearch);
         List<User> userList = Lists.newArrayList();
+        List<Integer> idList = Lists.newArrayList();
         for(User userItem : userSet){
             if(userItem.getId() != userID){
-                userList.add(userItem);
+                idList.add(userItem.getId());
             }
         }
+        PageHelper.startPage(pageNum,pageSize);
+        userList = userMapper.selectUserByIdList(idList);
+        Collections.sort(userList, new Comparator<User>() {
+            @Override
+            public int compare(User o1, User o2) {
+                //升序
+                return o1.getRole().compareTo(o2.getRole());
+            }
+        });
         PageInfo<User> pageInfo = new PageInfo<User>(userList);
-        return ServerResponse.createBySuccess(pageInfo.getList());
+        int count=(int)pageInfo.getTotal();
+        return ServerResponse.createBySuccess("",count,pageInfo.getList());
     }
 
     public ServerResponse getShopperList(int userID, int pageNum, int pageSize, ShopperSearch shopperSearch){
-        PageHelper.startPage(pageNum,pageSize);
+        //PageHelper.startPage(pageNum,pageSize);
         Set<User> userSet = Sets.newHashSet();
         findChildUser(userSet,userID);
         List<User> userList = Lists.newArrayList();
         for(User userItem : userSet){
             userList.add(userItem);
         }
-        Collections.sort(userList, new Comparator<User>() {
-            @Override
-            public int compare(User o1, User o2) {
-                //升序
-                return o1.getId().compareTo(o2.getId());
-            }
-        });
+
         User hostUser = userMapper.selectByRealname(shopperSearch.getHostname());
         User agentUser = userMapper.selectByRealname(shopperSearch.getAgentname());
         Integer hostUserId;
@@ -261,40 +288,44 @@ public class UserServiceImpl implements IUserService {
             agentUserId = null;
         }
         List<ShopperInfo> shopperInfoList = Lists.newArrayList();
-        Set<ShopperInfo> shopperInfoSet = Sets.newHashSet();
+        List<Shopper> shopperList = Lists.newArrayList();
         Set<Integer> idSet = new HashSet<Integer>();
+        List<Integer> idList = Lists.newArrayList();
+
         for(User userItem : userList){
-            List<Shopper> shopperList = shopperMapper.selectShopperByCondition(userItem.getId(),hostUserId,agentUserId);
+            List<Shopper> shopperListtemp = shopperMapper.selectShopperByCondition(userItem.getId(),hostUserId,agentUserId);
             if(shopperList == null){
                 continue;
             }
-            for(Shopper shopperItem : shopperList){
-                User userHost = userMapper.selectByPrimaryKey(shopperItem.getUserId());
-                User userAgent = userMapper.selectByPrimaryKey(shopperItem.getAgentId());
-                ShopperInfo shopperInfo = new ShopperInfo();
-                shopperInfo.setId(shopperItem.getId());
-                shopperInfo.setHostname(userHost.getRealname());
-                shopperInfo.setAgentname(userAgent.getRealname());
-                shopperInfo.setShoppername(shopperItem.getShoppername());
-                shopperInfo.setAddress(shopperItem.getAddress());
-                shopperInfo.setPhone(shopperItem.getPhone());
-                shopperInfo.setZfbId(shopperItem.getZfbId());
-                shopperInfo.setWxId(shopperItem.getWxId());
-                shopperInfo.setYsfId(shopperItem.getYsfId());
-                shopperInfo.setBussinessLicense(shopperItem.getBussinessLicense());
-                shopperInfo.setAuthcode(shopperItem.getAuthcode());
-                shopperInfo.setRate(shopperItem.getRate());
-                shopperInfo.setCreateTime(shopperItem.getCreateTime());
-                shopperInfo.setUpdateTime(shopperItem.getUpdateTime());
-                if(!idSet.contains(shopperInfo.getId())){
-                    idSet.add(shopperInfo.getId());
-                    shopperInfoSet.add(shopperInfo);
+            for(Shopper shopperItem : shopperListtemp){
+                if(!idSet.contains(shopperItem.getId())){
+                    idSet.add(shopperItem.getId());
+                    idList.add(shopperItem.getId());
                 }
             }
-
         }
-        for(ShopperInfo shopperInfoIten:shopperInfoSet){
-            shopperInfoList.add(shopperInfoIten);
+        Collections.sort(idList);
+        PageHelper.startPage(pageNum,pageSize);
+        shopperList = shopperMapper.selectShopperByIdList(idList);
+        for(Shopper shopperItem:shopperList){
+            User userHost = userMapper.selectByPrimaryKey(shopperItem.getUserId());
+            User userAgent = userMapper.selectByPrimaryKey(shopperItem.getAgentId());
+            ShopperInfo shopperInfo = new ShopperInfo();
+            shopperInfo.setId(shopperItem.getId());
+            shopperInfo.setHostname(userHost.getRealname());
+            shopperInfo.setAgentname(userAgent.getRealname());
+            shopperInfo.setShoppername(shopperItem.getShoppername());
+            shopperInfo.setAddress(shopperItem.getAddress());
+            shopperInfo.setPhone(shopperItem.getPhone());
+            shopperInfo.setZfbId(shopperItem.getZfbId());
+            shopperInfo.setWxId(shopperItem.getWxId());
+            shopperInfo.setYsfId(shopperItem.getYsfId());
+            shopperInfo.setBussinessLicense(shopperItem.getBussinessLicense());
+            shopperInfo.setAuthcode(shopperItem.getAuthcode());
+            shopperInfo.setCreateTime(shopperItem.getCreateTime());
+            shopperInfo.setUpdateTime(shopperItem.getUpdateTime());
+
+            shopperInfoList.add(shopperInfo);
         }
 
         Collections.sort(shopperInfoList, new Comparator<ShopperInfo>() {
@@ -304,9 +335,10 @@ public class UserServiceImpl implements IUserService {
                 return o1.getId().compareTo(o2.getId());
             }
         });
-
-        PageInfo<ShopperInfo> pageInfo = new PageInfo<ShopperInfo>(shopperInfoList);
-        return ServerResponse.createBySuccess(pageInfo.getList());
+        PageInfo pageInfo = new PageInfo(shopperList);
+        pageInfo.setList(shopperInfoList);
+        int count = (int)pageInfo.getTotal();
+        return ServerResponse.createBySuccess("",count,pageInfo.getList());
     }
 
     public ServerResponse getOrderList(int userID, int pageNum, int pageSize, OrderSearch orderSearch){
@@ -389,6 +421,98 @@ public class UserServiceImpl implements IUserService {
         });
         PageInfo pageInfo = new PageInfo(orderList);
         pageInfo.setList(orderInfoList);
+
+        int count=(int)pageInfo.getTotal();
+        return ServerResponse.createBySuccess("",count,pageInfo.getList());
+    }
+
+    public ServerResponse getOrderShow(int userID, int pageNum, int pageSize, OrderSearch orderSearch){
+
+        Set<User> userSet = Sets.newHashSet();
+        findShopperChildUser(userSet,userID);  //获取所有的子用户到userSet中
+        List<User> userList = Lists.newArrayList();
+        List<OrderShow> orderShowList = Lists.newArrayList();
+        List<Integer> idList = Lists.newArrayList();
+        idList.add(userID);
+        for(User userItem : userSet){
+            if(userItem.getRole() != 4){
+                idList.add(userItem.getId());
+            }
+        }
+        PageHelper.startPage(pageNum,pageSize);
+        userList = userMapper.selectUserByIdList(idList);
+        for(User userItem:userList){
+            Map<String, BigDecimal> amountMap = getOrderAccount(userItem.getId(),orderSearch);
+            OrderShow orderShow = new OrderShow();
+            orderShow.setId(userItem.getId());
+            orderShow.setRealname(userItem.getRealname());
+            if(userItem.getRole() == 0){
+                orderShow.setRole("服务商");
+            }else if(userItem.getRole() == 1){
+                orderShow.setRole("一级代理商");
+            }else if(userItem.getRole() == 2){
+                orderShow.setRole("二级代理商");
+            }else if(userItem.getRole() == 3){
+                orderShow.setRole("三级代理商");
+            }
+            User pUser = userMapper.selectByPrimaryKey(userItem.getParentId());
+            orderShow.setAgentname(pUser.getRealname());
+            orderShow.setZfbAmount(amountMap.get("zfbAccount"));
+            orderShow.setWxAmount(amountMap.get("wxAccount"));
+            orderShow.setYsfAmount(amountMap.get("ysfAccount"));
+            orderShow.setTotalAmount(amountMap.get("totalAccount"));
+
+            orderShowList.add(orderShow);
+        }
+
+        PageInfo pageInfo = new PageInfo(userList);
+        pageInfo.setList(orderShowList);
+
+        int count=(int)pageInfo.getTotal();
+        return ServerResponse.createBySuccess("",count,pageInfo.getList());
+    }
+
+    public ServerResponse getCommisionShow(int userID, int pageNum, int pageSize, OrderSearch orderSearch){
+
+        Set<User> userSet = Sets.newHashSet();
+        findShopperChildUser(userSet,userID);  //获取所有的子用户到userSet中
+        List<User> userList = Lists.newArrayList();
+        List<CommisionShow> commisionShowList = Lists.newArrayList();
+        List<Integer> idList = Lists.newArrayList();
+        idList.add(userID);
+        for(User userItem : userSet){
+            if(userItem.getRole() != 4){
+                idList.add(userItem.getId());
+            }
+        }
+        PageHelper.startPage(pageNum,pageSize);
+        userList = userMapper.selectUserByIdList(idList);
+        for(User userItem:userList){
+            Map<String, String> amountMap = getCommisionAccount(userItem.getId(),orderSearch);
+            CommisionShow commisionShow = new CommisionShow();
+            commisionShow.setId(userItem.getId());
+            commisionShow.setRealname(userItem.getRealname());
+            if(userItem.getRole() == 0){
+                commisionShow.setRole("服务商");
+            }else if(userItem.getRole() == 1){
+                commisionShow.setRole("一级代理商");
+            }else if(userItem.getRole() == 2){
+                commisionShow.setRole("二级代理商");
+            }else if(userItem.getRole() == 3){
+                commisionShow.setRole("三级代理商");
+            }
+            User pUser = userMapper.selectByPrimaryKey(userItem.getParentId());
+            commisionShow.setAgentname(pUser.getRealname());
+            commisionShow.setZfbCommision(amountMap.get("zfbCommision"));
+            commisionShow.setWxCommision(amountMap.get("wxCommision"));
+            commisionShow.setYsfCommision(amountMap.get("ysfCommision"));
+            commisionShow.setTotalCommision(amountMap.get("totalCommision"));
+
+            commisionShowList.add(commisionShow);
+        }
+
+        PageInfo pageInfo = new PageInfo(userList);
+        pageInfo.setList(commisionShowList);
 
         int count=(int)pageInfo.getTotal();
         return ServerResponse.createBySuccess("",count,pageInfo.getList());
@@ -507,6 +631,132 @@ public class UserServiceImpl implements IUserService {
         return accountMap;
     }
 
+    public Map<String, String> getCommisionAccount(int userID, OrderSearch orderSearch){
+
+        Set<User> userSet = Sets.newHashSet();
+        findShopperChildUser(userSet,userID);
+        List<User> userList = Lists.newArrayList();
+        for(User userItem : userSet){
+            userList.add(userItem);
+        }
+        Collections.sort(userList, new Comparator<User>() {
+            @Override
+            public int compare(User o1, User o2) {
+                //升序
+                return o1.getId().compareTo(o2.getId());
+            }
+        });
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String startTime;
+        String endTime;
+        if(orderSearch.getStartTime() != null ){
+            startTime = sdf.format(orderSearch.getStartTime());
+        }else{
+            startTime = null;
+        }
+        if(orderSearch.getEndTime() != null){
+            endTime = sdf.format(orderSearch.getEndTime());
+        }else{
+            endTime = null;
+        }
+        /**
+         if(startTime != null && endTime != null){
+         if(orderSearch.getStartTime().after(orderSearch.getEndTime())  ||  orderSearch.getEndTime().after(new Date())){
+         return ServerResponse.createByErrorMessage("日期选择错误！");
+         }
+         }
+         **/
+        List<OrderInfo> orderInfoList = Lists.newArrayList();
+        Set<OrderInfo> orderInfoSet = Sets.newHashSet();
+        Set<Integer> idSet = new HashSet<Integer>();
+        for(User userItem : userList){
+            List<PayOrder> orderList = payOrderMapper.selectOrderByCondition(userItem.getId(),startTime,endTime);
+            if(orderList == null){
+                continue;
+            }
+            for(PayOrder orderItem : orderList){
+                PayInfo payInfo = payInfoMapper.selectByOrderNo(orderItem.getOrderNo());
+                User userHost = userMapper.selectByPrimaryKey(orderItem.getUserId());
+                User userAgent = userMapper.selectByPrimaryKey(userHost.getParentId());
+                Shopper shopper = shopperMapper.selectByUserId(userHost.getId());
+                String plateform;
+                if(payInfo.getPayPlatform()==1){
+                    plateform = "支付宝";
+                }else if(payInfo.getPayPlatform() == 2){
+                    plateform = "微信";
+                }else if(payInfo.getPayPlatform() == 3){
+                    plateform = "云闪付";
+                }else{
+                    plateform = "未知平台";
+                }
+                OrderInfo orderInfo = new OrderInfo();
+                orderInfo.setId(orderItem.getId());
+                orderInfo.setOrderNo(orderItem.getOrderNo());
+                orderInfo.setUsername(userHost.getRealname());
+                orderInfo.setAgentname(userAgent.getRealname());
+                orderInfo.setShoppername(shopper.getShoppername());
+                orderInfo.setPayment(orderItem.getPayment());
+                orderInfo.setPayPlatform(plateform);
+                orderInfo.setUpdateTime(orderItem.getUpdateTime());
+                if(!idSet.contains(orderInfo.getId())){
+                    idSet.add(orderInfo.getId());
+                    orderInfoSet.add(orderInfo);
+                }
+            }
+
+        }
+        for(OrderInfo orderInfoIten:orderInfoSet){
+            orderInfoList.add(orderInfoIten);
+        }
+
+        Collections.sort(orderInfoList, new Comparator<OrderInfo>() {
+            @Override
+            public int compare(OrderInfo o1, OrderInfo o2) {
+                //升序
+                return o1.getId().compareTo(o2.getId());
+            }
+        });
+
+        BigDecimal totalAccount = new BigDecimal(0);
+        BigDecimal zfbAccount = new BigDecimal(0);
+        BigDecimal wxAccount = new BigDecimal(0);
+        BigDecimal ysfAccount = new BigDecimal(0);
+        BigDecimal totalCommision = new BigDecimal(0);
+        BigDecimal zfbCommision = new BigDecimal(0);
+        BigDecimal wxCommision = new BigDecimal(0);
+        BigDecimal ysfCommision = new BigDecimal(0);
+        for(OrderInfo orderInfoItem:orderInfoList){
+            if(orderInfoItem.getPayPlatform().equals("支付宝")){
+                zfbAccount =  zfbAccount.add(orderInfoItem.getPayment());
+            }
+            if(orderInfoItem.getPayPlatform().equals("微信")){
+                wxAccount =  wxAccount.add(orderInfoItem.getPayment());
+            }
+            if(orderInfoItem.getPayPlatform().equals("云闪付")){
+                ysfAccount =  ysfAccount.add(orderInfoItem.getPayment());
+            }
+            totalAccount = totalAccount.add(orderInfoItem.getPayment());
+        }
+        User user = userMapper.selectByPrimaryKey(userID);
+        BigDecimal rate = new BigDecimal(user.getRate());
+        BigDecimal r = new BigDecimal(100);
+        rate = rate.divide(r);
+        totalCommision = totalAccount.multiply(rate);
+        zfbCommision = zfbAccount.multiply(rate);
+        wxCommision = wxAccount.multiply(rate);
+        ysfCommision = ysfAccount.multiply(rate);
+        HashMap<String,String> accountMap = new HashMap<>();
+        accountMap.put("totalAccount",totalAccount.setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+        accountMap.put("zfbAccount",zfbAccount.setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+        accountMap.put("wxAccount",wxAccount.setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+        accountMap.put("ysfAccount",ysfAccount.setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+        accountMap.put("totalCommision",totalCommision.setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+        accountMap.put("zfbCommision",zfbCommision.setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+        accountMap.put("wxCommision",wxCommision.setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+        accountMap.put("ysfCommision",ysfCommision.setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+        return accountMap;
+    }
+
     //递归算法，算出子节点
     private Set<User> findChildUser(Set<User> userSet,Integer userID,UserSearch userSearch){
         User user = userMapper.selectByPrimaryKey(userID);
@@ -547,23 +797,21 @@ public class UserServiceImpl implements IUserService {
         return userSet;
     }
 
-    public ServerResponse<User> updateUser(User user){
+    public ServerResponse<User> updateUser(EditUser editUser){
+        User oldUser = userMapper.selectByPrimaryKey(editUser.getId());
 
-        int resultCount = userMapper.checkPhoneByUserId(user.getPhone(),user.getId());
-        if(resultCount > 0){
-            return ServerResponse.createByErrorMessage("phone已经存在，请更换phone再尝试更新");
-        }
         User updateUser = new User();
-        updateUser.setId(user.getId());
-        updateUser.setParentId(user.getParentId());
-        updateUser.setUsername(user.getUsername());
-        updateUser.setRealname(user.getRealname());
-        updateUser.setPhone(user.getPhone());
-        updateUser.setIdentityId(user.getIdentityId());
-        updateUser.setBankId(user.getBankId());
-        updateUser.setQuestion(user.getQuestion());
-        updateUser.setAnswer(user.getAnswer());
-        updateUser.setRole(user.getRole());
+        updateUser.setId(editUser.getId());
+        updateUser.setParentId(editUser.getParentId());
+        updateUser.setUsername(oldUser.getUsername());
+        updateUser.setRealname(oldUser.getRealname());
+        updateUser.setPhone(editUser.getPhone());
+        updateUser.setIdentityId(oldUser.getIdentityId());
+        updateUser.setBankId(editUser.getBankId());
+        updateUser.setQuestion(oldUser.getQuestion());
+        updateUser.setAnswer(oldUser.getAnswer());
+        updateUser.setRole(oldUser.getRole());
+        updateUser.setRate(editUser.getRate());
 
         int updateCount = userMapper.updateByPrimaryKeySelective(updateUser);
         if(updateCount > 0){
@@ -572,20 +820,21 @@ public class UserServiceImpl implements IUserService {
         return ServerResponse.createByErrorMessage("更新失败！");
     }
 
-    public ServerResponse<Shopper> updateShopper(Shopper shopper){
+    public ServerResponse<Shopper> updateShopper(EditShopper editShopper){
+        Shopper oldShopper = shopperMapper.selectByPrimaryKey(editShopper.getId());
+
         Shopper updateShopper = new Shopper();
-        updateShopper.setId(shopper.getId());
-        updateShopper.setUserId(shopper.getUserId());
-        updateShopper.setAgentId(shopper.getAgentId());
-        updateShopper.setPhone(shopper.getPhone());
-        updateShopper.setAddress(shopper.getAddress());
-        updateShopper.setBussinessLicense(shopper.getBussinessLicense());
-        updateShopper.setZfbId(shopper.getZfbId());
-        updateShopper.setWxId(shopper.getWxId());
-        updateShopper.setYsfId(shopper.getYsfId());
-        updateShopper.setAuthcode(shopper.getAuthcode());
-        updateShopper.setRate(shopper.getRate());
-        updateShopper.setShoppername(shopper.getShoppername());
+        updateShopper.setId(editShopper.getId());
+        updateShopper.setUserId(oldShopper.getUserId());
+        updateShopper.setAgentId(oldShopper.getAgentId());
+        updateShopper.setPhone(editShopper.getPhone());
+        updateShopper.setAddress(oldShopper.getAddress());
+        updateShopper.setBussinessLicense(oldShopper.getBussinessLicense());
+        updateShopper.setZfbId(editShopper.getZfbId());
+        updateShopper.setWxId(editShopper.getWxId());
+        updateShopper.setYsfId(editShopper.getYsfId());
+        updateShopper.setAuthcode(editShopper.getAuthcode());
+        updateShopper.setShoppername(editShopper.getShoppername());
 
         int updateCount = shopperMapper.updateByPrimaryKeySelective(updateShopper);
         if(updateCount > 0){
@@ -616,7 +865,7 @@ public class UserServiceImpl implements IUserService {
         return ServerResponse.createByErrorMessage("删除失败！");
     }
 
-    public ServerResponse<String> addShopper(ShopperDevice shopperDevice){
+    public ServerResponse<String> addShopper(ShopperDevice shopperDevice){ //更新shopper的信息
         Shopper insertShopper = new Shopper();
         Device insertDevice = new Device();
 
@@ -630,7 +879,7 @@ public class UserServiceImpl implements IUserService {
         insertShopper.setAddress(shopperDevice.getAddress());
         insertShopper.setAuthcode(shopperDevice.getAuthcode());
         insertShopper.setBussinessLicense(shopperDevice.getBussinessLicense());
-        insertShopper.setRate(shopperDevice.getRate());
+
 
         insertDevice.setUserId(shopperDevice.getUserId());
         insertDevice.setAgentId(shopperDevice.getAgentId());

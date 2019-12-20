@@ -45,6 +45,13 @@
 						   lay-verify="required" placeholder="请输入银行卡号" value="${user.bankId }">
 				</div>
 			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">分润比率</label>
+				<div class="layui-input-block">
+					<input type="text" id="rate" name="rate" class="layui-input"
+						   lay-verify="required" placeholder="请输入分润比率" value="${user.rate }">
+				</div>
+			</div>
 
 			<div class="layui-form-item">
 				<div class="layui-input-block">

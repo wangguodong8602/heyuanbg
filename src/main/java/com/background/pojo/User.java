@@ -25,11 +25,13 @@ public class User {
 
     private Integer role;
 
+    private Double rate;
+
     private Date createTime;
 
     private Date updateTime;
 
-    public User(Integer id, Integer parentId, String realname, String username, String password, String phone, String identityId, String bankId, String question, String answer, Integer role, Date createTime, Date updateTime) {
+    public User(Integer id, Integer parentId, String realname, String username, String password, String phone, String identityId, String bankId, String question, String answer, Integer role,Double rate, Date createTime, Date updateTime) {
         this.id = id;
         this.parentId = parentId;
         this.realname = realname;
@@ -41,8 +43,17 @@ public class User {
         this.question = question;
         this.answer = answer;
         this.role = role;
+        this.rate = rate;
         this.createTime = createTime;
         this.updateTime = updateTime;
+    }
+
+    public Double getRate() {
+        return rate;
+    }
+
+    public void setRate(Double rate) {
+        this.rate = rate;
     }
 
     public User() {

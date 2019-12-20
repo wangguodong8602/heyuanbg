@@ -51,11 +51,6 @@
 								</a>
 							</dd>
 							<dd>
-								<a href="javascript:;" data-url= "${ctx }/jsp/userInfo.jsp">
-									<cite>我的分润</cite>
-								</a>
-							</dd>
-							<dd>
 								<a href="javascript:;" data-url="${ctx }/jsp/updateUserInfo.jsp">
 									<cite>更新信息</cite>
 								</a>
@@ -98,7 +93,7 @@
 							</dd>
 							<dd>
 								<a href="javascript:;" data-url="${ctx }/jsp/addShopper.jsp">
-									<cite>添加商家</cite>
+									<cite>补全商家信息</cite>
 								</a>
 							</dd>
 						</dl>
@@ -111,12 +106,30 @@
 						<dl class="layui-nav-child">
 							<dd>
 								<a href="javascript:;" data-url="${ctx }/jsp/orderList.jsp">
-									<cite>时间查询</cite>
+									<cite>流水明细</cite>
 								</a>
 							</dd>
 							<dd>
-								<a href="javascript:;" data-url="${ctx }/jsp/orderInfoMonth.html">
-									<cite>当月查询</cite>
+								<a href="javascript:;" data-url="${ctx }/jsp/orderShow.jsp">
+									<cite>流水概览</cite>
+								</a>
+							</dd>
+						</dl>
+					</li>
+					<li class="layui-nav-item">
+						<a href="javascript:;">
+							<cite>佣金查询</cite>
+							<span class="layui-nav-more"></span>
+						</a>
+						<dl class="layui-nav-child">
+							<dd>
+								<a href="javascript:;" data-url="${ctx }/jsp/commisionInfo.jsp">
+									<cite>我的佣金</cite>
+								</a>
+							</dd>
+							<dd>
+								<a href="javascript:;" data-url="${ctx }/jsp/commisionShow.jsp">
+									<cite>佣金概览</cite>
 								</a>
 							</dd>
 						</dl>
@@ -130,6 +143,19 @@
 							<dd>
 								<a href="javascript:;" data-url="${ctx }/jsp/adver.jsp">
 									<cite>申请投放</cite>
+								</a>
+							</dd>
+						</dl>
+					</li>
+					<li class="layui-nav-item">
+						<a href="javascript:;">
+							<cite>公告</cite>
+							<span class="layui-nav-more"></span>
+						</a>
+						<dl class="layui-nav-child">
+							<dd>
+								<a href="javascript:;" data-url="${ctx }/jsp/noticeList.jsp">
+									<cite>公告列表</cite>
 								</a>
 							</dd>
 						</dl>

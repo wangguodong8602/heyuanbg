@@ -59,13 +59,6 @@
 						   lay-verify="required" placeholder="请输入授权码" value="${shopper.authcode }">
 				</div>
 			</div>
-			<div class="layui-form-item">
-				<label class="layui-form-label">费率</label>
-				<div class="layui-input-block">
-					<input type="text" id="rate" name="rate" class="layui-input"
-						   lay-verify="required" placeholder="请输入费率" value="${shopper.rate }">
-				</div>
-			</div>
 
 			<div class="layui-form-item">
 				<div class="layui-input-block">

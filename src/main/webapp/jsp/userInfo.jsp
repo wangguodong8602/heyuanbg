@@ -73,6 +73,12 @@ pageEncoding="UTF-8"%>
 						<input id="role" type="text" name="role" autocomplete="off" class="layui-input" disabled="disabled" value="role">
 					</div>
 				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">分润比率：</label>
+					<div class="layui-input-block">
+						<input id="rate" type="text" name="rate" autocomplete="off" class="layui-input" disabled="disabled" value="rate">
+					</div>
+				</div>
 			</form>>
 		</div>
 	</div>
@@ -82,7 +88,7 @@ pageEncoding="UTF-8"%>
 <script type="text/javascript">
     $.ajax({
         url:ctx + "/user/get_user_info.do",
-        type:"get",
+        type:"post",
         data:{},
         success:function(res){
         	document.getElementById("id").value = res.data.id;
@@ -95,14 +101,15 @@ pageEncoding="UTF-8"%>
 			if(res.data.role == 0){
 				document.getElementById("role").value = "服务商";
 			}else if(res.data.role == 1){
-				document.getElementById("role").value = "一级代理员";
+				document.getElementById("role").value = "一级代理商";
 			}else if(res.data.role == 2){
-				document.getElementById("role").value = "二级代理员";
+				document.getElementById("role").value = "二级代理商";
 			}else if(res.data.role == 3){
-				document.getElementById("role").value = "三级级代理员";
+				document.getElementById("role").value = "三级代理商";
 			}else{
 				document.getElementById("role").value = "商户";
 			}
+			document.getElementById("rate").value = res.data.rate;
         },
         error:function(){
 			console.log("错误");

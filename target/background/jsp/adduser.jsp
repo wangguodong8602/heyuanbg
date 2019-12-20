@@ -82,6 +82,7 @@ pageEncoding="UTF-8"%>
 			var question = "我的用户名";
 			var answer = username;
 			var role;
+			var rate=0;
 			if($('#roleInfoID').val() == 21){
 				role = 1;
 			}else if($('#roleInfoID').val() == 22){
@@ -106,7 +107,8 @@ pageEncoding="UTF-8"%>
 					question:question,
 					answer:answer,
 					role:role,
-					realname:realname
+					realname:realname,
+					rate:rate
 				},
 				success:function(result){
 					if(result.code == 0){

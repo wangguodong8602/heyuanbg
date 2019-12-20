@@ -46,6 +46,9 @@
 			<button type="button" class="layui-btn layui-btn-sm" lay-event="delete">
 				<i class="layui-icon">&#xe640;</i>
 			</button>
+			<button type="button" class="layui-btn layui-btn-sm" lay-event="resetpassword">
+				<i class="layui-icon">&#x1002;</i>
+			</button>
 		</div>
     </script>
 	<script type="text/javascript" src="${ctx }/layui/layui.js"></script>

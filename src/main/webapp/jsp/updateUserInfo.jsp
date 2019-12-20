@@ -74,6 +74,12 @@ pageEncoding="UTF-8"%>
 					</div>
 				</div>
 				<div class="layui-form-item">
+					<label class="layui-form-label">分润比率：</label>
+					<div class="layui-input-block">
+						<input id = "rate" type="text" name="rate" autocomplete="off" class="layui-input" disabled="disabled" value="rate">
+					</div>
+				</div>
+				<div class="layui-form-item">
 					<label class="layui-form-label">密码问题：</label>
 					<div class="layui-input-block">
 						<input id="question" type="text" name="question" autocomplete="off" class="layui-input" value="question">
@@ -97,7 +103,7 @@ pageEncoding="UTF-8"%>
 <script type="text/javascript">
 	$.ajax({
 		url:ctx + "/user/get_user_info.do",
-		type:"get",
+		type:"post",
 		data:{},
 		success:function(res){
 			document.getElementById("id").value = res.data.id;
@@ -112,14 +118,15 @@ pageEncoding="UTF-8"%>
 			if(res.data.role == 0){
 				document.getElementById("role").value = "服务商";
 			}else if(res.data.role == 1){
-				document.getElementById("role").value = "一级代理员";
+				document.getElementById("role").value = "一级代理商";
 			}else if(res.data.role == 2){
-				document.getElementById("role").value = "二级代理员";
+				document.getElementById("role").value = "二级代理商";
 			}else if(res.data.role == 3){
-				document.getElementById("role").value = "三级代理员";
+				document.getElementById("role").value = "三级代理商";
 			}else{
 				document.getElementById("role").value = "商户";
 			}
+			document.getElementById("rate").value = res.data.rate;
 		},
 		error:function(){
 			console.log("错误");
@@ -139,6 +146,7 @@ pageEncoding="UTF-8"%>
 			var bankId = $('#bankId').val();
 			var question = $('#question').val();
 			var answer = $('#answer').val();
+			var rate = $('#rate').val();
 
 			$.ajax({
 				url:ctx + "/user/update_information.do",
@@ -153,7 +161,8 @@ pageEncoding="UTF-8"%>
 					identityId:identityId,
 					bankId:bankId,
 					question:question,
-					answer:answer
+					answer:answer,
+					rate:rate
 				},
 				success:function(result){
 					if(result.code == 0){

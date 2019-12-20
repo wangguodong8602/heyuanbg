@@ -49,10 +49,10 @@ public class UserController {
     }
 
     @RequestMapping(value = "/logout.do",method = RequestMethod.GET)
-    @ResponseBody
-    public ServerResponse<String> logout(HttpSession session){
+    //@ResponseBody
+    public String logout(HttpSession session){
         session.removeAttribute(Const.CURRENT_USER);
-        return ServerResponse.createBySuccess();
+        return "/login.jsp";
     }
 
     @RequestMapping(value = "/register.do",method = RequestMethod.POST)
@@ -69,7 +69,7 @@ public class UserController {
         return iUserService.checkValid(str,type);
     }
 
-    @RequestMapping(value = "/get_user_info.do",method = RequestMethod.GET)
+    @RequestMapping(value = "/get_user_info.do",method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<User> getUserInfo(HttpSession session){
         User user = (User) session.getAttribute(Const.CURRENT_USER);
@@ -110,6 +110,17 @@ public class UserController {
         return iUserService.resetPassword(passwordOld,passwordNew1,user);
     }
 
+    @RequestMapping(value = "/refresh_password.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> refreshPassword(HttpSession session, int id){
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        if(user == null){
+            return ServerResponse.createByErrorMessage("用户未登录");
+        }
+        int currUserId = user.getId();
+        return iUserService.refreshPassword(currUserId,id);
+    }
+
     @RequestMapping(value = "/update_information.do",method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<User> update_information(HttpSession session, User user){
@@ -140,7 +151,7 @@ public class UserController {
 
     @RequestMapping(value = "/get_user_list.do",method = RequestMethod.GET)
     @ResponseBody
-    public ServerResponse<User> getUserList(HttpSession session, @RequestParam(value = "pageNum",defaultValue = "1") int pageNum, @RequestParam(value = "pageSize",defaultValue = "10") int pageSize, UserSearch userSearch){
+    public ServerResponse<User> getUserList(HttpSession session, @RequestParam(value = "page",defaultValue = "1") int pageNum, @RequestParam(value = "limit",defaultValue = "10") int pageSize, UserSearch userSearch){
         User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
         if(currentUser == null){
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"未登录，需要强制登录status=10");
@@ -149,9 +160,9 @@ public class UserController {
 
     }
 
-    @RequestMapping(value = "/get_shopper_list.do",method = RequestMethod.GET)
+    @RequestMapping(value = "/get_shopper_list.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<ShopperInfo> getShopperList(HttpSession session, @RequestParam(value = "pageNum",defaultValue = "1") int pageNum, @RequestParam(value = "pageSize",defaultValue = "10") int pageSize, ShopperSearch shopperSearch){
+    public ServerResponse<ShopperInfo> getShopperList(HttpSession session, @RequestParam(value = "page",defaultValue = "1") int pageNum, @RequestParam(value = "limit",defaultValue = "10") int pageSize, ShopperSearch shopperSearch){
         User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
         if(currentUser == null){
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"未登录，需要强制登录status=10");
@@ -171,6 +182,28 @@ public class UserController {
 
     }
 
+    @RequestMapping(value = "/get_order_show.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<User> getOrderShow(HttpSession session, @RequestParam(value = "page",defaultValue = "1") int pageNum, @RequestParam(value = "limit",defaultValue = "10") int pageSize, OrderSearch orderSearch){
+        User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
+        if(currentUser == null){
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"未登录，需要强制登录status=10");
+        }
+        return iUserService.getOrderShow(currentUser.getId(),pageNum,pageSize,orderSearch);
+
+    }
+
+    @RequestMapping(value = "/get_commision_show.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<User> getCommisionShow(HttpSession session, @RequestParam(value = "page",defaultValue = "1") int pageNum, @RequestParam(value = "limit",defaultValue = "10") int pageSize, OrderSearch orderSearch){
+        User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
+        if(currentUser == null){
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"未登录，需要强制登录status=10");
+        }
+        return iUserService.getCommisionShow(currentUser.getId(),pageNum,pageSize,orderSearch);
+
+    }
+
     @RequestMapping(value = "/get_order_account.do",method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<Map> getOrderAccount(HttpSession session, OrderSearch orderSearch){
@@ -179,6 +212,18 @@ public class UserController {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"未登录，需要强制登录status=10");
         }
         Map<String, BigDecimal> accountMap = iUserService.getOrderAccount(currentUser.getId(),orderSearch);
+        return ServerResponse.createBySuccess(accountMap);
+
+    }
+
+    @RequestMapping(value = "/get_commision_account.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map> getCommisionAccount(HttpSession session, OrderSearch orderSearch){
+        User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
+        if(currentUser == null){
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"未登录，需要强制登录status=10");
+        }
+        Map<String, String> accountMap = iUserService.getCommisionAccount(currentUser.getId(),orderSearch);
         return ServerResponse.createBySuccess(accountMap);
 
     }
@@ -204,16 +249,15 @@ public class UserController {
 
     @RequestMapping(value = "updateUser.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<User> updateUser(User user){
-        return iUserService.updateUser(user);
+    public ServerResponse<User> updateUser(EditUser editUser){
+        return iUserService.updateUser(editUser);
     }
 
 
     @RequestMapping(value = "updateShopper.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<Shopper> updateShopper(Shopper shopper){
-        System.out.println("========");
-        return iUserService.updateShopper(shopper);
+    public ServerResponse<Shopper> updateShopper(EditShopper editShopper){
+        return iUserService.updateShopper(editShopper);
     }
 
     @RequestMapping(value = "deleteUserById.do",method = RequestMethod.POST)
@@ -244,6 +288,9 @@ public class UserController {
     @ResponseBody
     public ServerResponse<String> addShopper(HttpSession session, ShopperDevice shopperDevice){
         User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
+        if(currentUser.getRole()!=4){
+            return ServerResponse.createByErrorMessage("对不起，您没有操作权限，此操作仅适用于商户用户！");
+        }
         shopperDevice.setUserId(currentUser.getId());
         shopperDevice.setAgentId(currentUser.getParentId());
         return iUserService.addShopper(shopperDevice);

@@ -13,15 +13,13 @@
       <arg column="ysf_id" jdbcType="VARCHAR" javaType="java.lang.String" />
       <arg column="authcode" jdbcType="VARCHAR" javaType="java.lang.String" />
       <arg column="address" jdbcType="VARCHAR" javaType="java.lang.String" />
-      <arg column="rate" jdbcType="REAL" javaType="java.lang.Float" />
       <arg column="bussiness_license" jdbcType="VARCHAR" javaType="java.lang.String" />
       <arg column="create_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
       <arg column="update_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
     </constructor>
   </resultMap>
   <sql id="Base_Column_List" >
-    id, user_id, agent_id, shoppername, phone, zfb_id, wx_id, ysf_id, authcode, address, 
-    rate, bussiness_license, create_time, update_time
+    id, user_id, agent_id, shoppername, phone, zfb_id, wx_id, ysf_id, authcode, address, bussiness_license, create_time, update_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -37,12 +35,12 @@
     insert into shopper (id, user_id, agent_id, 
       shoppername, phone, zfb_id, 
       wx_id, ysf_id, authcode, 
-      address, rate, bussiness_license, 
+      address, bussiness_license,
       create_time, update_time)
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{agentId,jdbcType=INTEGER}, 
       #{shoppername,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{zfbId,jdbcType=VARCHAR}, 
       #{wxId,jdbcType=VARCHAR}, #{ysfId,jdbcType=VARCHAR}, #{authcode,jdbcType=VARCHAR}, 
-      #{address,jdbcType=VARCHAR}, #{rate,jdbcType=REAL}, #{bussinessLicense,jdbcType=VARCHAR}, 
+      #{address,jdbcType=VARCHAR}, #{bussinessLicense,jdbcType=VARCHAR},
       now(), now())
   </insert>
   <insert id="insertSelective" parameterType="com.background.pojo.Shopper" >
@@ -77,9 +75,6 @@
       </if>
       <if test="address != null" >
         address,
-      </if>
-      <if test="rate != null" >
-        rate,
       </if>
       <if test="bussinessLicense != null" >
         bussiness_license,
@@ -122,9 +117,6 @@
       <if test="address != null" >
         #{address,jdbcType=VARCHAR},
       </if>
-      <if test="rate != null" >
-        #{rate,jdbcType=REAL},
-      </if>
       <if test="bussinessLicense != null" >
         #{bussinessLicense,jdbcType=VARCHAR},
       </if>
@@ -166,9 +158,6 @@
       <if test="address != null" >
         address = #{address,jdbcType=VARCHAR},
       </if>
-      <if test="rate != null" >
-        rate = #{rate,jdbcType=REAL},
-      </if>
       <if test="bussinessLicense != null" >
         bussiness_license = #{bussinessLicense,jdbcType=VARCHAR},
       </if>
@@ -192,7 +181,6 @@
       ysf_id = #{ysfId,jdbcType=VARCHAR},
       authcode = #{authcode,jdbcType=VARCHAR},
       address = #{address,jdbcType=VARCHAR},
-      rate = #{rate,jdbcType=REAL},
       bussiness_license = #{bussinessLicense,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = now()
@@ -221,5 +209,16 @@
     <include refid="Base_Column_List" />
     from shopper
     where user_id = #{userID}
+  </select>
+
+  <select id="selectShopperByIdList" resultMap="BaseResultMap" parameterType="list">
+    select <include refid="Base_Column_List"/>
+    from shopper
+    <where>
+      id in
+      <foreach collection="idList" index="index" item="item" separator="," open="(" close=")">
+        (#{item})
+      </foreach>
+    </where>
   </select>
 </mapper>

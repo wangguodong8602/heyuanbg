@@ -78,12 +78,6 @@ pageEncoding="UTF-8"%>
 					</div>
 				</div>
 				<div class="layui-form-item">
-					<label class="layui-form-label">费率：</label>
-					<div class="layui-input-block">
-						<input  id="rate" type="text" name="rate" autocomplete="off" class="layui-input" placeholder="请输入费率">
-					</div>
-				</div>
-				<div class="layui-form-item">
 					<label class="layui-form-label">设备ID：</label>
 					<div class="layui-input-block">
 						<input  id="deviceId" type="text" name="deviceId" autocomplete="off" class="layui-input" placeholder="请输入设备ID">
@@ -129,7 +123,6 @@ pageEncoding="UTF-8"%>
 			var wxId = $('#wxId').val();
 			var ysfId = $('#ysfId').val();
 			var authcode = $('#authcode').val();
-			var rate = $('#rate').val();
 			var deviceId = $('#deviceId').val();
 			var deviceKey = $('#deviceKey').val();
 			var deviceType = $('#deviceType').val();
@@ -149,7 +142,6 @@ pageEncoding="UTF-8"%>
 					wxId:wxId,
 					ysfId:ysfId,
 					authcode:authcode,
-					rate:rate,
 					deviceId:deviceId,
 					deviceKey:deviceKey,
 					deviceType:deviceType,

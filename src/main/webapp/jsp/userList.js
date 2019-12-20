@@ -22,7 +22,7 @@
 	    ,limit:10// 每页默认数
 	    ,limits:[10,20,30,40]
 	    ,cols: [[
-				{field: 'id', title: 'ID',align:'center',width:50}
+				{field: 'id', title: 'ID',align:'center',width:150}
 				,{field: 'parentId', title: '激活码',align:'center', width:150}
 				,{field: 'username', title: '用户名',align:'center', width:150}
 				,{field: 'realname', title: '真实姓名',align:'center', width:150}
@@ -30,9 +30,10 @@
 				,{field: 'identityId', title: '身份证',align:'center', width:200}
 				,{field: 'bankId', title: '银行卡',align:'center', width:200}
 				,{field: 'role', title: '角色',align:'center', width:150}
+				,{field: 'rate', title: '分润比率',align:'center', width:150}
 				,{field: 'createTime', title: '创建时间',align:'center',templet : '<div>{{ formatTime(d.createTime,"yyyy-MM-dd hh:mm:ss")}}</div>', width:180}
 				,{field: 'updateTime', title: '修改时间', align:'center',templet : '<div>{{ formatTime(d.updateTime,"yyyy-MM-dd hh:mm:ss")}}</div>',width:180}
-				,{field: 'right',title: '操作', align:'center', toolbar: "#barDemo"}
+				,{field: 'right',title: '操作', align:'center', toolbar: "#barDemo",width:150}
 			]]
 			,page: true // 开启分页
 			,loading:true
@@ -72,6 +73,28 @@
 				success : function() {
 
 				}
+			});
+		}else if (obj.event == 'resetpassword'){
+			layer.confirm('确定要重置 '+data.username+' 的密码么？', function (index) {
+				$.ajax({
+					url : ctx + '/user/refresh_password.do',
+					type : "POST",
+					data: {"id": data.id},
+					success : function(d) {
+						if (d.code == 0) {
+							layer.msg("重置密码成功！",{icon: 1});
+							obj.del();
+						} else {
+							layer.msg("权限不足，重置密码失败！", {
+								icon : 5
+							});
+						}
+					},
+					error:function(){
+						layer.msg("重置密码失败！网络错误！",{icon: 5});
+					}
+				})
+				layer.close(index);
 			});
 		}
 	});

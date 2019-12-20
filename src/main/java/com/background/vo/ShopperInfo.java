@@ -23,23 +23,13 @@ public class ShopperInfo {
 
     private String address;
 
-    private Float rate;
-
     private String bussinessLicense;
 
     private Date createTime;
 
     private Date updateTime;
 
-    public Float getRate() {
-        return rate;
-    }
-
-    public void setRate(Float rate) {
-        this.rate = rate;
-    }
-
-    public ShopperInfo(Integer id, String hostname, String agentname, String shoppername, String phone, String zfbId, String wxId, String ysfId, String authcode, String address, String bussinessLicense, Float rate, Date createTime, Date updateTime) {
+    public ShopperInfo(Integer id, String hostname, String agentname, String shoppername, String phone, String zfbId, String wxId, String ysfId, String authcode, String address, String bussinessLicense, Date createTime, Date updateTime) {
         this.id = id;
         this.hostname = hostname;
         this.agentname = agentname;
@@ -51,7 +41,6 @@ public class ShopperInfo {
         this.authcode = authcode;
         this.address = address;
         this.bussinessLicense = bussinessLicense;
-        this.rate = rate;
         this.createTime = createTime;
         this.updateTime = updateTime;
     }
