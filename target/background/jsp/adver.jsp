@@ -12,7 +12,7 @@
 
 </head>
 <body>
-    <div id="divId" align="center" background="${ctx}/image/back_04.jpg">
+    <div id="divId" align="center">
         <h2>广告投放文件上传</h2>
         <h2>上传图片文件</h2>
         <form name="form1" action="" method="post" enctype="multipart/form-data">
