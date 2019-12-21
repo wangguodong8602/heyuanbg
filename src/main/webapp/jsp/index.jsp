@@ -100,6 +100,24 @@
 					</li>
 					<li class="layui-nav-item">
 						<a href="javascript:;">
+							<cite>设备管理</cite>
+							<span class="layui-nav-more"></span>
+						</a>
+						<dl class="layui-nav-child">
+							<dd>
+								<a href="javascript:;" data-url="${ctx }/jsp/deviceList.jsp">
+									<cite>激活设备列表</cite>
+								</a>
+							</dd>
+							<dd>
+								<a href="javascript:;" data-url="${ctx }/jsp/addDevice.jsp">
+									<cite>添加设备</cite>
+								</a>
+							</dd>
+						</dl>
+					</li>
+					<li class="layui-nav-item">
+						<a href="javascript:;">
 							<cite>流水查询</cite>
 							<span class="layui-nav-more"></span>
 						</a>

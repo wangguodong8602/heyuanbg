@@ -5,6 +5,7 @@ import com.background.common.ResponseCode;
 import com.background.common.ServerResponse;
 import com.background.dao.ShopperMapper;
 import com.background.dao.UserMapper;
+import com.background.pojo.Device;
 import com.background.pojo.Shopper;
 import com.background.pojo.User;
 import com.background.service.IOrderService;
@@ -61,6 +62,18 @@ public class UserController {
         User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
         user.setParentId(currentUser.getId());
         return iUserService.register(user);
+    }
+
+    @RequestMapping(value = "/add_device.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> addDevice(HttpSession session, Device device){
+        User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
+        if(currentUser.getRole() != 4){
+            return ServerResponse.createByErrorMessage("对不起！您没有添加设备权限！");
+        }
+        device.setUserId(currentUser.getId());
+        device.setAgentId(currentUser.getParentId());
+        return iUserService.addDevice(device);
     }
 
     @RequestMapping(value = "/check_valid.do",method = RequestMethod.GET)
@@ -168,6 +181,17 @@ public class UserController {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"未登录，需要强制登录status=10");
         }
         return iUserService.getShopperList(currentUser.getId(),pageNum,pageSize,shopperSearch);
+
+    }
+
+    @RequestMapping(value = "/get_device_list.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<DeviceInfo> getDeviceList(HttpSession session, @RequestParam(value = "page",defaultValue = "1") int pageNum, @RequestParam(value = "limit",defaultValue = "10") int pageSize, ShopperSearch shopperSearch){
+        User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
+        if(currentUser == null){
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"未登录，需要强制登录status=10");
+        }
+        return iUserService.getDeviceList(currentUser.getId(),pageNum,pageSize,shopperSearch);
 
     }
 
@@ -282,6 +306,13 @@ public class UserController {
         }else{
             return ServerResponse.createByErrorMessage("对不起，您没有删除权限！");
         }
+    }
+
+    @RequestMapping(value = "deleteDeviceById.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> deleteDeviceById(HttpSession session,int id){
+        User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
+        return iUserService.deleteDeviceById(id);
     }
 
     @RequestMapping(value = "/addShopper.do",method = RequestMethod.POST)

@@ -1,6 +1,7 @@
 package com.background.service;
 
 import com.background.common.ServerResponse;
+import com.background.pojo.Device;
 import com.background.pojo.Shopper;
 import com.background.pojo.User;
 import com.background.vo.*;
@@ -12,6 +13,9 @@ public interface IUserService {
 
     ServerResponse<User> login(String username, String password);
     ServerResponse<String> register(User user);
+
+    ServerResponse<String> addDevice(Device device);
+
     ServerResponse<String> checkValid(String str, String type);
     ServerResponse selectQuestion(String username);
     ServerResponse<String> checkAnswer(String username, String question, String answer);
@@ -29,10 +33,13 @@ public interface IUserService {
     ServerResponse<User> updateUser(EditUser editUser);
     ServerResponse<String> deleteUserById(int id);
     ServerResponse getShopperList(int userID, int pageNum, int pageSize, ShopperSearch shopperSearch);
+    ServerResponse getDeviceList(int userID, int pageNum, int pageSize, ShopperSearch shopperSearch);
     ServerResponse<String> addShopper(ShopperDevice shopperDevice);
 
     ServerResponse<Shopper> updateShopper(EditShopper editShopper);
     ServerResponse<String> deleteShopperById(int id);
+
+    ServerResponse<String> deleteDeviceById(int id);
 
     ServerResponse getOrderList(int userID, int pageNum, int pageSize, OrderSearch orderSearch);
 

@@ -155,4 +155,32 @@
     from device
     where device_id = #{deviceSN}
   </select>
+
+  <select id="selectDeviceByCondition" resultMap="BaseResultMap" parameterType="map">
+    select <include refid="Base_Column_List"/>
+    from device
+    <where>
+      1=1
+      <if test="null != hostID and '' != hostID">
+        and user_id = #{hostID}
+      </if>
+      <if test="null != agentID and '' != agentID">
+        and agent_id = #{agentID}
+      </if>
+      <if test="null == hostID or '' == hostID">
+        and user_id = #{userID}
+      </if>
+    </where>
+  </select>
+
+  <select id="selectDeviceByIdList" resultMap="BaseResultMap" parameterType="list">
+    select <include refid="Base_Column_List"/>
+    from device
+    <where>
+      id in
+      <foreach collection="idList" index="index" item="item" separator="," open="(" close=")">
+        (#{item})
+      </foreach>
+    </where>
+  </select>
 </mapper>

@@ -341,6 +341,81 @@ public class UserServiceImpl implements IUserService {
         return ServerResponse.createBySuccess("",count,pageInfo.getList());
     }
 
+    public ServerResponse getDeviceList(int userID, int pageNum, int pageSize, ShopperSearch shopperSearch){
+        User currentUser = userMapper.selectByPrimaryKey(userID);
+        Set<User> userSet = Sets.newHashSet();
+        findChildUser(userSet,userID);
+        List<User> userList = Lists.newArrayList();
+        userList.add(currentUser);
+        for(User userItem : userSet){
+            userList.add(userItem);
+        }
+        User hostUser = userMapper.selectByRealname(shopperSearch.getHostname());
+        User agentUser = userMapper.selectByRealname(shopperSearch.getAgentname());
+        Integer hostUserId;
+        Integer agentUserId;
+        if(hostUser != null){
+            hostUserId = hostUser.getId();
+        }else{
+            hostUserId = null;
+        }
+        if(agentUser != null){
+            agentUserId = agentUser.getId();
+        }else{
+            agentUserId = null;
+        }
+        List<DeviceInfo> deviceInfoList = Lists.newArrayList();
+        List<Device> deviceList = Lists.newArrayList();
+        Set<Integer> idSet = new HashSet<Integer>();
+        List<Integer> idList = Lists.newArrayList();
+
+
+        for(User userItem : userList){
+            List<Device> deviceListTemp = deviceMapper.selectDeviceByCondition(userItem.getId(),hostUserId,agentUserId);
+            if(deviceListTemp == null){
+                continue;
+            }
+            for(Device deviceItem : deviceListTemp){
+                if(!idSet.contains(deviceItem.getId())){
+                    idSet.add(deviceItem.getId());
+                    idList.add(deviceItem.getId());
+                }
+            }
+        }
+        Collections.sort(idList);
+        PageHelper.startPage(pageNum,pageSize);
+        deviceList = deviceMapper.selectDeviceByIdList(idList);
+        for(Device deviceItem:deviceList){
+            User userHost = userMapper.selectByPrimaryKey(deviceItem.getUserId());
+            User userAgent = userMapper.selectByPrimaryKey(deviceItem.getAgentId());
+            Shopper shopper = shopperMapper.selectByUserId(userHost.getId());
+            DeviceInfo deviceInfo = new DeviceInfo();
+
+            deviceInfo.setId(deviceItem.getId());
+            deviceInfo.setDeviceSn(deviceItem.getDeviceId());
+            deviceInfo.setHostname(userHost.getRealname());
+            deviceInfo.setAgentname(userAgent.getRealname());
+            deviceInfo.setPhone(userHost.getPhone());
+            deviceInfo.setShoppername(shopper.getShoppername());
+            deviceInfo.setCreateTime(deviceItem.getCreateTime());
+            deviceInfo.setUpdateTime(deviceItem.getUpdateTime());
+
+            deviceInfoList.add(deviceInfo);
+        }
+
+        Collections.sort(deviceInfoList, new Comparator<DeviceInfo>() {
+            @Override
+            public int compare(DeviceInfo o1, DeviceInfo o2) {
+                //升序
+                return o1.getId().compareTo(o2.getId());
+            }
+        });
+        PageInfo pageInfo = new PageInfo(deviceList);
+        pageInfo.setList(deviceInfoList);
+        int count = (int)pageInfo.getTotal();
+        return ServerResponse.createBySuccess("",count,pageInfo.getList());
+    }
+
     public ServerResponse getOrderList(int userID, int pageNum, int pageSize, OrderSearch orderSearch){
 
         Set<User> userSet = Sets.newHashSet();
@@ -866,6 +941,15 @@ public class UserServiceImpl implements IUserService {
         return ServerResponse.createByErrorMessage("删除失败！");
     }
 
+    public ServerResponse<String> deleteDeviceById(int id){
+
+        int resultCount = deviceMapper.deleteByPrimaryKey(id);
+        if(resultCount > 0){
+            return ServerResponse.createBySuccessMessage("删除成功！");
+        }
+        return ServerResponse.createByErrorMessage("删除失败！");
+    }
+
     public ServerResponse<String> addShopper(ShopperDevice shopperDevice){ //更新shopper的信息
         Shopper insertShopper = new Shopper();
         Device insertDevice = new Device();
@@ -898,6 +982,27 @@ public class UserServiceImpl implements IUserService {
             return ServerResponse.createBySuccessMessage("设备添加失败~");
         }else if(resultCountShopper == 0 && resultCountDevice > 0){
             return ServerResponse.createBySuccessMessage("商家添加失败~");
+        }else{
+            return ServerResponse.createByErrorMessage("添加失败");
+        }
+
+    }
+
+    public ServerResponse<String> addDevice(Device device){ //更新shopper的信息
+
+        Device insertDevice = new Device();
+
+        insertDevice.setUserId(device.getUserId());
+        insertDevice.setAgentId(device.getAgentId());
+        insertDevice.setDeviceId(device.getDeviceId());
+        insertDevice.setDeviceKey(device.getDeviceKey());
+        insertDevice.setDeviceType(device.getDeviceType());
+        insertDevice.setActiveCode(device.getActiveCode());
+
+        int resultCountDevice = deviceMapper.insert(insertDevice);
+
+        if(resultCountDevice > 0){
+            return ServerResponse.createBySuccessMessage("添加成功~");
         }else{
             return ServerResponse.createByErrorMessage("添加失败");
         }
