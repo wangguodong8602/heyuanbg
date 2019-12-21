@@ -15,12 +15,13 @@
 		html,body{
 			width: 100%;
 			height: 100%;
-			background: url(${ctx}/image/back_04.jpg) bottom center no-repeat #efeff4;
+			background: url(${ctx}/image/back_08.jpg) bottom center no-repeat #efeff4;
 			background-size: 100% 100%;
 		}
 	</style>
 </head>
 <body>
+    <div align="center">
 		<div class="login-main">
 			<label>欢迎登录</label>
 			<header class="layui-elip">和源创支付管理平台</header>
@@ -40,7 +41,7 @@
 				</div>
 			</form>
 		</div>
-
+    </div>
 	<script type="text/javascript" src="${ctx }/layui/layui.js"></script>
 	<script type="text/javascript" src="${ctx }/js/login.js"></script>
 </body>
