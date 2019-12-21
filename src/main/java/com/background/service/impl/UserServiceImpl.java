@@ -344,10 +344,11 @@ public class UserServiceImpl implements IUserService {
     public ServerResponse getOrderList(int userID, int pageNum, int pageSize, OrderSearch orderSearch){
 
         Set<User> userSet = Sets.newHashSet();
-        findShopperChildUser(userSet,userID);  //获取所有的子用户到userSet中
+        findChildUser(userSet,userID);  //获取所有的子用户到userSet中
         List<User> userList = Lists.newArrayList();
         for(User userItem : userSet){
             userList.add(userItem);
+            System.out.println(userItem.getId());
         }
         SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String startTime;
@@ -429,7 +430,7 @@ public class UserServiceImpl implements IUserService {
     public ServerResponse getOrderShow(int userID, int pageNum, int pageSize, OrderSearch orderSearch){
 
         Set<User> userSet = Sets.newHashSet();
-        findShopperChildUser(userSet,userID);  //获取所有的子用户到userSet中
+        findChildUser(userSet,userID);  //获取所有的子用户到userSet中
         List<User> userList = Lists.newArrayList();
         List<OrderShow> orderShowList = Lists.newArrayList();
         List<Integer> idList = Lists.newArrayList();
@@ -475,7 +476,7 @@ public class UserServiceImpl implements IUserService {
     public ServerResponse getCommisionShow(int userID, int pageNum, int pageSize, OrderSearch orderSearch){
 
         Set<User> userSet = Sets.newHashSet();
-        findShopperChildUser(userSet,userID);  //获取所有的子用户到userSet中
+        findChildUser(userSet,userID);  //获取所有的子用户到userSet中
         List<User> userList = Lists.newArrayList();
         List<CommisionShow> commisionShowList = Lists.newArrayList();
         List<Integer> idList = Lists.newArrayList();
@@ -523,7 +524,7 @@ public class UserServiceImpl implements IUserService {
     public Map<String, BigDecimal> getOrderAccount(int userID, OrderSearch orderSearch){
 
         Set<User> userSet = Sets.newHashSet();
-        findShopperChildUser(userSet,userID);
+        findChildUser(userSet,userID);
         List<User> userList = Lists.newArrayList();
         for(User userItem : userSet){
             userList.add(userItem);
@@ -634,7 +635,7 @@ public class UserServiceImpl implements IUserService {
     public Map<String, String> getCommisionAccount(int userID, OrderSearch orderSearch){
 
         Set<User> userSet = Sets.newHashSet();
-        findShopperChildUser(userSet,userID);
+        findChildUser(userSet,userID);
         List<User> userList = Lists.newArrayList();
         for(User userItem : userSet){
             userList.add(userItem);
