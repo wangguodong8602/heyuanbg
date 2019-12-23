@@ -36,6 +36,7 @@ public class OrderController {
     @RequestMapping(value = "/mini_pay.do",method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse miniPay(String bizNo,String barCode, String codeType, String deviceSn, String totalAmount)throws Exception{
+        deviceSn = "QCF420191019142669";
         return iOrderService.pay(bizNo,barCode,codeType,deviceSn,totalAmount);
     }
 
