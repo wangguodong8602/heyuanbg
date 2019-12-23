@@ -181,6 +181,9 @@ public class OrderServiceImpl implements IOrderService {
         String outTradeNo = bizNo;
 
         Device device = deviceMapper.selectBySN(deviceSn);
+        if(device == null){
+            return ServerResponse.createByErrorMessage("对不起，该机器尚未与后台商户进行绑定，无法发起支付请求！");
+        }
         Shopper shopper = shopperMapper.selectByUserId(device.getUserId());
 
 
@@ -366,6 +369,9 @@ public class OrderServiceImpl implements IOrderService {
         //        + (long) (Math.random() * 10000000L);
         String outTradeNo = bizNo;
         Device device = deviceMapper.selectBySN(deviceSn);
+        if(device == null){
+            return ServerResponse.createByErrorMessage("对不起，该机器尚未与后台商户进行绑定，无法发起支付请求！");
+        }
         Shopper shopper = shopperMapper.selectByUserId(device.getUserId());
 
         String subject = shopper.getShoppername()+"微信消费";
