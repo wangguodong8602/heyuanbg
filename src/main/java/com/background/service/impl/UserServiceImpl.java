@@ -250,6 +250,9 @@ public class UserServiceImpl implements IUserService {
                 idList.add(userItem.getId());
             }
         }
+        if(idList.isEmpty()){
+            return  ServerResponse.createBySuccessMessage("无数据");
+        }
         PageHelper.startPage(pageNum,pageSize);
         userList = userMapper.selectUserByIdList(idList);
         Collections.sort(userList, new Comparator<User>() {
@@ -259,6 +262,7 @@ public class UserServiceImpl implements IUserService {
                 return o1.getRole().compareTo(o2.getRole());
             }
         });
+
         PageInfo<User> pageInfo = new PageInfo<User>(userList);
         int count=(int)pageInfo.getTotal();
         return ServerResponse.createBySuccess("",count,pageInfo.getList());
@@ -303,6 +307,9 @@ public class UserServiceImpl implements IUserService {
                     idList.add(shopperItem.getId());
                 }
             }
+        }
+        if(idList.isEmpty()){
+            return  ServerResponse.createBySuccessMessage("无数据");
         }
         Collections.sort(idList);
         PageHelper.startPage(pageNum,pageSize);
@@ -382,6 +389,9 @@ public class UserServiceImpl implements IUserService {
                 }
             }
         }
+        if(idList.isEmpty()){
+            return  ServerResponse.createBySuccessMessage("无数据");
+        }
         Collections.sort(idList);
         PageHelper.startPage(pageNum,pageSize);
         deviceList = deviceMapper.selectDeviceByIdList(idList);
@@ -457,6 +467,9 @@ public class UserServiceImpl implements IUserService {
                 idList.add(orderItem.getId());
             }
         }
+        if(idList.isEmpty()){
+            return  ServerResponse.createBySuccessMessage("无数据");
+        }
         Collections.sort(idList);
         PageHelper.startPage(pageNum,pageSize);
         List<PayOrder> orderList = payOrderMapper.selectOrderByIdList(idList);
@@ -515,6 +528,9 @@ public class UserServiceImpl implements IUserService {
                 idList.add(userItem.getId());
             }
         }
+        if(idList.isEmpty()){
+            return  ServerResponse.createBySuccessMessage("无数据");
+        }
         PageHelper.startPage(pageNum,pageSize);
         userList = userMapper.selectUserByIdList(idList);
         for(User userItem:userList){
@@ -560,6 +576,9 @@ public class UserServiceImpl implements IUserService {
             if(userItem.getRole() != 4){
                 idList.add(userItem.getId());
             }
+        }
+        if(idList.isEmpty()){
+            return  ServerResponse.createBySuccessMessage("无数据");
         }
         PageHelper.startPage(pageNum,pageSize);
         userList = userMapper.selectUserByIdList(idList);

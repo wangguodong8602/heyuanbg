@@ -41,7 +41,7 @@
 							流水总额
 						</div>
 						<div class="layui-col-md12 layui-inline layui-input-inline">
-							<input type="text" id="totalAccount" name="totalAccount" class="layui-input" value="5000" disabled="disabled">
+							<input type="text" id="totalAccount" name="totalAccount" class="layui-input" value="0" disabled="disabled">
 						</div>
 					</div>
 				</div>
@@ -52,7 +52,7 @@
 							支付宝
 						</div>
 						<div class="layui-col-md10 layui-inline layui-input-inline">
-							<input type="text" id="zfbAccount" name="zfbAccount" class="layui-input" value="5000" disabled="disabled">
+							<input type="text" id="zfbAccount" name="zfbAccount" class="layui-input" value="0" disabled="disabled">
 						</div>
 					</div>
 				</div>
@@ -63,7 +63,7 @@
 							微信
 						</div>
 						<div class="layui-col-md10 layui-inline layui-input-inline">
-							<input type="text" id="wxAccount" name="wxAccount" class="layui-input" value="5000" disabled="disabled">
+							<input type="text" id="wxAccount" name="wxAccount" class="layui-input" value="0" disabled="disabled">
 						</div>
 					</div>
 				</div>
@@ -74,7 +74,7 @@
 							云闪付
 						</div>
 						<div class="layui-col-md10 layui-inline layui-input-inline">
-							<input type="text" id="ysfAccount" name="ysfAccount" class="layui-input" value="5000" disabled="disabled">
+							<input type="text" id="ysfAccount" name="ysfAccount" class="layui-input" value="0" disabled="disabled">
 						</div>
 					</div>
 				</div>
