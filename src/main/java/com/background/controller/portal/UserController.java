@@ -256,19 +256,54 @@ public class UserController {
     public String editUser(int id, HttpSession session) {
         User user = userMapper.selectByPrimaryKey(id);
         session.setAttribute("user", user);
-        return "/jsp/editUser.jsp";
+
+        User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
+        if(currentUser.getRole() == 0){
+            return "/jsp/isv/editUser.jsp";
+        }else if(currentUser.getRole() == 1){
+            return "/jsp/first/editUser.jsp";
+        }else if(currentUser.getRole() == 2){
+            return "/jsp/second/editUser.jsp";
+        }else if(currentUser.getRole() == 3){
+            return "/jsp/third/editUser.jsp";
+        }else{
+            return "/jsp/forth/editUser.jsp";
+        }
     }
 
     @RequestMapping(value = "/index.do", method = RequestMethod.GET)
     public String index(HttpSession session) {
-        return "/jsp/index.jsp";
+        User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
+        if(currentUser.getRole() == 0){
+            return "/jsp/isv/index.jsp";
+        }else if(currentUser.getRole() == 1){
+            return "/jsp/first/index.jsp";
+        }else if(currentUser.getRole() == 2){
+            return "/jsp/second/index.jsp";
+        }else if(currentUser.getRole() == 3){
+            return "/jsp/third/index.jsp";
+        }else{
+            return "/jsp/forth/index.jsp";
+        }
+
     }
 
     @RequestMapping(value = "/editShopper.do", method = RequestMethod.GET)
     public String editShopper(int id, HttpSession session) {
         Shopper shopper = shopperMapper.selectByPrimaryKey(id);
         session.setAttribute("shopper", shopper);
-        return "/jsp/editShopper.jsp";
+        User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
+        if(currentUser.getRole() == 0){
+            return "/jsp/isv/editShopper.jsp";
+        }else if(currentUser.getRole() == 1){
+            return "/jsp/first/editShopper.jsp";
+        }else if(currentUser.getRole() == 2){
+            return "/jsp/second/editShopper.jsp";
+        }else if(currentUser.getRole() == 3){
+            return "/jsp/third/editShopper.jsp";
+        }else{
+            return "/jsp/forth/editShopper.jsp";
+        }
     }
 
     @RequestMapping(value = "updateUser.do",method = RequestMethod.POST)
