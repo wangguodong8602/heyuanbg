@@ -29,7 +29,21 @@
 				,{field: 'phone', title: '联系电话',align:'center', width:150}
 				,{field: 'identityId', title: '身份证',align:'center', width:200}
 				,{field: 'bankId', title: '银行卡',align:'center', width:200}
-				,{field: 'role', title: '角色',align:'center', width:150}
+				,{field: 'role', title: '角色',align:'center', width:150, templet: function (d) {
+					if (d.role == 0){
+						return '服务商';
+					}else if (d.role == 1){
+						return '一级代理商';
+					}
+					else if (d.role == 2){
+						return '二级代理商';
+					}
+					else if (d.role == 3){
+						return '三级代理商';
+					}else{
+						return  '商户';
+					}
+				}}
 				,{field: 'rate', title: '分润比率',align:'center', width:150}
 				,{field: 'createTime', title: '创建时间',align:'center',templet : '<div>{{ formatTime(d.createTime,"yyyy-MM-dd hh:mm:ss")}}</div>', width:180}
 				,{field: 'updateTime', title: '修改时间', align:'center',templet : '<div>{{ formatTime(d.updateTime,"yyyy-MM-dd hh:mm:ss")}}</div>',width:180}

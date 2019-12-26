@@ -28,7 +28,7 @@
 				<label class="layui-form-label">激活码</label>
 				<div class="layui-input-block">
 					<input type="text" id="parentId" name="phone" class="layui-input"
-						   lay-verify="required" placeholder="请输入激活码" value="${user.parentId }">
+						   lay-verify="required" placeholder="请输入激活码" value="${user.parentId }" disabled="disabled">
 				</div>
 			</div>
 			<div class="layui-form-item">
