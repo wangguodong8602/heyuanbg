@@ -189,5 +189,6 @@
         (#{item})
       </foreach>
     </where>
+    order by id DESC
   </select>
 </mapper>
