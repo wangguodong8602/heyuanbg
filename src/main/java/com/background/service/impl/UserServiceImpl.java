@@ -505,7 +505,7 @@ public class UserServiceImpl implements IUserService {
             @Override
             public int compare(OrderInfo o1, OrderInfo o2) {
                 //升序
-                return o1.getId().compareTo(o2.getId());
+                return o2.getId().compareTo(o1.getId());
             }
         });
         PageInfo pageInfo = new PageInfo(orderList);
