@@ -15,7 +15,7 @@
 		html,body{
 			width: 100%;
 			height: 100%;
-			background: url(${ctx}/image/back_08.jpg) bottom center no-repeat #efeff4;
+			background: url(${ctx}/image/back_66.png) bottom center no-repeat #efeff4;
 			background-size: 100% 100%;
 		}
 	</style>
