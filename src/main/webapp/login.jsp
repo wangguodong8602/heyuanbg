@@ -42,6 +42,9 @@
 			</form>
 		</div>
     </div>
+	<div style="position:absolute;right:50px;bottom:50px;">
+		<a href="http://www.beian.miit.gov.cn" target="_blank" rel="nofollow noopener" style="color:white;Font-size:18px">备案号：陕ICP备19023713号</a>
+	</div>
 	<script type="text/javascript" src="${ctx }/layui/layui.js"></script>
 	<script type="text/javascript" src="${ctx }/js/login.js"></script>
 </body>
